@@ -128,7 +128,8 @@ public class EntityDamage extends AbstractFunnyListener {
                 Player victimPlayer = (Player) victim;
                 Player attackerPlayer = attacker;
                 
-                boolean wasInCombat = this.combatManager.isInCombat(victimUser.getUUID());
+                boolean wasVictimInCombat = this.combatManager.isInCombat(victimUser.getUUID());
+                boolean wasAttackerInCombat = this.combatManager.isInCombat(attackerUser.getUUID());
                 
                 // Enter victim into combat
                 this.combatManager.enterCombat(victimUser, attackerUser, this.config.combatLog.duration);
@@ -137,12 +138,11 @@ public class EntityDamage extends AbstractFunnyListener {
                 this.combatManager.enterCombat(attackerUser, victimUser, this.config.combatLog.duration);
                 
                 // Show notification only if entering combat for the first time
-                if (!wasInCombat) {
+                if (!wasVictimInCombat) {
                     this.combatNotificationHandler.showCombatStart(victimPlayer, attackerUser);
                 }
                 
-                boolean attackerWasInCombat = this.combatManager.isInCombat(attackerUser.getUUID());
-                if (!attackerWasInCombat) {
+                if (!wasAttackerInCombat) {
                     this.combatNotificationHandler.showCombatStart(attackerPlayer, victimUser);
                 }
             }

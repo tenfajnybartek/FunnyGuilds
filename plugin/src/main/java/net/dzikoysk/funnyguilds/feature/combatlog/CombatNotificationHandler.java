@@ -195,7 +195,7 @@ public class CombatNotificationHandler {
         String timeString = this.formatTime(remaining);
         
         Option<User> attackerOption = state.getAttacker();
-        String attackerName = attackerOption.map(User::getName).orElseGet("Unknown");
+        String attackerName = attackerOption.map(User::getName).orElseGet(() -> "Unknown");
 
         FunnyFormatter formatter = new FunnyFormatter()
             .register("{TIME}", timeString)
@@ -210,7 +210,7 @@ public class CombatNotificationHandler {
                         .sendActionBar();
                     break;
                 case BOSSBAR:
-                    this.updateBossBar(player, remaining, state.getCombatDuration().orElseGet(() -> Duration.ofSeconds(30)), formatter);
+                    this.updateBossBar(player, remaining, state.getCombatDuration().orElseGet(() -> this.config.combatLog.duration), formatter);
                     break;
                 case CHAT:
                     // Only send chat message once per combat, not every update
