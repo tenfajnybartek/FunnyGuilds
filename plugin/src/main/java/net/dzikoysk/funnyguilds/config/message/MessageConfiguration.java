@@ -799,6 +799,8 @@ public class MessageConfiguration extends OkaeriConfig implements MessageReposit
     public SendableMessage combatLogCommandBlocked = ChatHolder.message("&cNie możesz użyć komendy &7/{COMMAND} &cpodczas walki! &7(pozostało: &f{TIME}&7)");
     public SendableMessage combatLogNotInCombat = ChatHolder.message("&7Nie jesteś w trakcie walki!");
     public SendableMessage combatLogTimeRemaining = ChatHolder.message("&7Pozostały czas walki: &c{TIME} &7(przeciwnik: &c{ATTACKER}&7)");
+    @Comment("Wiadomość wylogowania podczas walki - Dostępne zmienne: {ATTACKER}, {VICTIM}, {-}, {+}, {MINUS-FORMATTED}, {PLUS-FORMATTED}, {POINTS}, {POINTS-FORMAT}, {VTAG}, {ATAG}")
+    public SendableMessage combatLogLogoutMessage = ChatHolder.message("{ATAG}&b{ATTACKER} &7({PLUS-FORMATTED}&7) zabil {VTAG}&b{VICTIM} &7({MINUS-FORMATTED}&7) &ckto wylogowal sie podczas walki");
 
     @Override
     public OkaeriConfig load() throws OkaeriException {

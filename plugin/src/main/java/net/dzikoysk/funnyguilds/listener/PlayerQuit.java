@@ -1,5 +1,9 @@
 package net.dzikoysk.funnyguilds.listener;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.dzikoysk.funnyguilds.damage.DamageManager;
 import net.dzikoysk.funnyguilds.damage.DamageState;
 import net.dzikoysk.funnyguilds.event.FunnyEvent;
@@ -20,6 +24,9 @@ import org.panda_lang.utilities.inject.annotations.Inject;
 import panda.std.Option;
 
 public class PlayerQuit extends AbstractFunnyListener {
+
+    // Track players who are dying due to combat logout
+    private static final Set<UUID> COMBAT_LOGOUT_DEATHS = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     @Inject
     private DamageManager damageManager;
@@ -56,11 +63,24 @@ public class PlayerQuit extends AbstractFunnyListener {
             CombatState combatState = this.combatManager.getCombatState(user.getUUID());
             
             if (combatState.isInCombat()) {
+                // Mark this death as a combat logout death
+                COMBAT_LOGOUT_DEATHS.add(player.getUniqueId());
+                
                 // Kill the player before they disconnect
                 // This will trigger PlayerDeathEvent which handles death messages, drops, etc.
                 player.setHealth(0.0);
             }
         });
+    }
+    
+    /**
+     * Checks if a death was caused by combat logout
+     * 
+     * @param playerUUID The player UUID
+     * @return true if the player is dying due to combat logout
+     */
+    public static boolean isCombatLogoutDeath(UUID playerUUID) {
+        return COMBAT_LOGOUT_DEATHS.remove(playerUUID);
     }
 
     private void handleQuit(Player player) {

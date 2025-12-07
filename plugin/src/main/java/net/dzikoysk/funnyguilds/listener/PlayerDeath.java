@@ -1,5 +1,6 @@
 package net.dzikoysk.funnyguilds.listener;
 
+import dev.peri.yetanothermessageslibrary.message.SendableMessage;
 import dev.peri.yetanothermessageslibrary.replace.Replaceable;
 
 import java.net.InetAddress;
@@ -333,6 +334,9 @@ public class PlayerDeath extends AbstractFunnyListener {
         Guild attackerGuild = attacker.getGuild().orNull();
         Guild victimGuild = victim.getGuild().orNull();
 
+        // Check if this death was caused by combat logout
+        boolean isCombatLogout = PlayerQuit.isCombatLogoutDeath(victim.getUUID());
+
         for (User receiver : receivers) {
             Guild receiverGuild = receiver.getGuild().orNull();
 
@@ -340,7 +344,12 @@ public class PlayerDeath extends AbstractFunnyListener {
                     .register("{VTAG}", this.config.relationalTag.chooseAndPrepareTag(receiverGuild, victimGuild))
                     .register("{ATAG}", this.config.relationalTag.chooseAndPrepareTag(receiverGuild, attackerGuild));
 
-            this.messageService.getMessage(config -> config.rankDeathMessage)
+            // Use combat logout message if applicable, otherwise use normal death message
+            SendableMessage deathMessage = isCombatLogout 
+                    ? this.messageService.getMessage(config -> config.combatLogLogoutMessage)
+                    : this.messageService.getMessage(config -> config.rankDeathMessage);
+            
+            deathMessage
                     .with(killFormatter)
                     .with(relationalFormatter)
                     .with(itemReplacement)
@@ -357,7 +366,12 @@ public class PlayerDeath extends AbstractFunnyListener {
                         .map(guild -> FunnyFormatter.format(this.config.chatGuild.getValue(), "{TAG}", guild.getTag()))
                         .orElseGet(""));
 
-        this.messageService.getMessage(config -> config.rankDeathMessage)
+        // Use combat logout message for console if applicable
+        SendableMessage consoleDeathMessage = isCombatLogout 
+                ? this.messageService.getMessage(config -> config.combatLogLogoutMessage)
+                : this.messageService.getMessage(config -> config.rankDeathMessage);
+        
+        consoleDeathMessage
                 .with(killFormatter)
                 .with(consoleTagFormatter)
                 .with(itemReplacement)
