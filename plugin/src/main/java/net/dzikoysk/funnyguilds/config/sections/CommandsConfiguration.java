@@ -73,7 +73,7 @@ public class CommandsConfiguration extends OkaeriConfig {
     @Comment("")
     public FunnyCommand permissions = new FunnyCommand("uprawnienia", Arrays.asList("perms", "permissions"));
     @Comment("")
-    public FunnyCommand combattime = new FunnyCommand("combattime", Collections.singletonList("ct"));
+    public FunnyCommand combattime = new FunnyCommand("combattime", Arrays.asList("ct", "walka", "antylogaut"));
 
     @Comment
     @Comment("Komendy administratora")

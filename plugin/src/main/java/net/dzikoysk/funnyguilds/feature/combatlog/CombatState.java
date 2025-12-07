@@ -92,7 +92,7 @@ public class CombatState {
      * @return Optional containing the attacker user
      */
     public Option<User> getAttacker() {
-        return Option.ofNullable(this.attacker);
+        return this.attacker == null ? Option.none() : Option.of(this.attacker);
     }
 
     /**
@@ -110,7 +110,7 @@ public class CombatState {
      * @return Optional containing combat duration if in combat
      */
     public Option<Duration> getCombatDuration() {
-        return Option.ofNullable(this.combatDuration);
+        return this.combatDuration == null ? Option.none() : Option.of(this.combatDuration);
     }
 
     /**
@@ -119,7 +119,7 @@ public class CombatState {
      * @return Optional containing combat start instant
      */
     public Option<Instant> getCombatStart() {
-        return Option.ofNullable(this.combatStart);
+        return this.combatStart == null ? Option.none() : Option.of(this.combatStart);
     }
 
 }

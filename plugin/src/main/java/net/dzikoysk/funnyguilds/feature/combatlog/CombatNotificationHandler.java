@@ -12,6 +12,7 @@ import net.dzikoysk.funnyguilds.shared.formatter.FunnyFormatter;
 import net.dzikoysk.funnyguilds.user.User;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.entity.Player;
@@ -64,7 +65,7 @@ public class CombatNotificationHandler {
             UUID playerUUID = entry.getKey();
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                this.plugin.getAdventure().player(player).hideBossBar(entry.getValue());
+                player.hideBossBar(entry.getValue());
             }
         }
         this.bossBars.clear();
@@ -117,14 +118,13 @@ public class CombatNotificationHandler {
 
         // Show end message
         FunnyFormatter formatter = new FunnyFormatter();
+        String endMessage = this.messageService.get(config -> config.combatLogEnd);
         
         for (CombatNotificationType type : this.config.combatLog.notificationTypes) {
             switch (type) {
                 case ACTIONBAR:
-                    this.messageService.getMessage(config -> config.combatLogEnd)
-                        .with(formatter)
-                        .receiver(player)
-                        .sendActionBar();
+                    Component actionBarComponent = formatter.replace(ChatUtils.deserializeAmpersand(endMessage));
+                    player.sendActionBar(actionBarComponent);
                     break;
                 case CHAT:
                     this.messageService.getMessage(config -> config.combatLogEnd)
@@ -133,13 +133,8 @@ public class CombatNotificationHandler {
                         .send();
                     break;
                 case TITLE:
-                    Component titleComponent = ChatUtils.deserializeAmpersand(this.messageService.get(config -> config.combatLogEnd));
-                    this.plugin.getAdventure().player(player).showTitle(
-                        net.kyori.adventure.title.Title.title(
-                            Component.empty(),
-                            titleComponent
-                        )
-                    );
+                    Component titleComponent = formatter.replace(ChatUtils.deserializeAmpersand(endMessage));
+                    player.showTitle(Title.title(Component.empty(), titleComponent));
                     break;
                 case BOSSBAR:
                     // Remove boss bar
@@ -201,13 +196,13 @@ public class CombatNotificationHandler {
             .register("{TIME}", timeString)
             .register("{ATTACKER}", attackerName);
 
+        String activeMessage = this.messageService.get(config -> config.combatLogActive);
+        
         for (CombatNotificationType type : this.config.combatLog.notificationTypes) {
             switch (type) {
                 case ACTIONBAR:
-                    this.messageService.getMessage(config -> config.combatLogActive)
-                        .with(formatter)
-                        .receiver(player)
-                        .sendActionBar();
+                    Component actionBarComponent = formatter.replace(ChatUtils.deserializeAmpersand(activeMessage));
+                    player.sendActionBar(actionBarComponent);
                     break;
                 case BOSSBAR:
                     this.updateBossBar(player, remaining, state.getCombatDuration().orElseGet(() -> this.config.combatLog.duration), formatter);
@@ -249,7 +244,7 @@ public class CombatNotificationHandler {
                 this.convertBarStyle(this.config.combatLog.bossBar.style)
             );
             this.bossBars.put(player.getUniqueId(), bossBar);
-            this.plugin.getAdventure().player(player).showBossBar(bossBar);
+            player.showBossBar(bossBar);
         } else {
             // Update existing boss bar
             bossBar = bossBar.name(titleComponent);
@@ -272,7 +267,7 @@ public class CombatNotificationHandler {
         if (bossBar != null) {
             Player player = Bukkit.getPlayer(playerUUID);
             if (player != null) {
-                this.plugin.getAdventure().player(player).hideBossBar(bossBar);
+                player.hideBossBar(bossBar);
             }
         }
     }
