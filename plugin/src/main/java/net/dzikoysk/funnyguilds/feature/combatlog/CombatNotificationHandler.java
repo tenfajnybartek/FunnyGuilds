@@ -127,10 +127,9 @@ public class CombatNotificationHandler {
                     player.sendActionBar(actionBarComponent);
                     break;
                 case CHAT:
-                    this.messageService.getMessage(config -> config.combatLogEnd)
-                        .with(formatter)
-                        .receiver(player)
-                        .send();
+                    // Send chat message directly since combatLogEnd is a String
+                    Component chatComponent = formatter.replace(ChatUtils.deserializeAmpersand(endMessage));
+                    player.sendMessage(chatComponent);
                     break;
                 case TITLE:
                     Component titleComponent = formatter.replace(ChatUtils.deserializeAmpersand(endMessage));
