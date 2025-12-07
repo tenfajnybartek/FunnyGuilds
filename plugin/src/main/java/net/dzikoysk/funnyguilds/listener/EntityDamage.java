@@ -123,18 +123,6 @@ public class EntityDamage extends AbstractFunnyListener {
                 return;
             }
 
-            if (!this.config.assistEnable || event.isCancelled()) {
-                return;
-            }
-
-            if (HookManager.WORLD_GUARD.map(worldGuard -> worldGuard.isInNonAssistsRegion(victim.getLocation()))
-                    .orElseGet(false)) {
-                return;
-            }
-
-            DamageState damageState = this.damageManager.getDamageState(victimUser.getUUID());
-            damageState.addDamage(attackerUser, event.getDamage());
-
             // Enter both players into combat if combat log is enabled
             if (this.config.combatLog.enabled && victim instanceof Player && attacker instanceof Player) {
                 Player victimPlayer = (Player) victim;
@@ -158,6 +146,18 @@ public class EntityDamage extends AbstractFunnyListener {
                     this.combatNotificationHandler.showCombatStart(attackerPlayer, victimUser);
                 }
             }
+
+            if (!this.config.assistEnable || event.isCancelled()) {
+                return;
+            }
+
+            if (HookManager.WORLD_GUARD.map(worldGuard -> worldGuard.isInNonAssistsRegion(victim.getLocation()))
+                    .orElseGet(false)) {
+                return;
+            }
+
+            DamageState damageState = this.damageManager.getDamageState(victimUser.getUUID());
+            damageState.addDamage(attackerUser, event.getDamage());
         });
     }
 

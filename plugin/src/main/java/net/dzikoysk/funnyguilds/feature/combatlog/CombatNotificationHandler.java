@@ -155,10 +155,20 @@ public class CombatNotificationHandler {
     private void updateNotifications() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             CombatState state = this.combatManager.getCombatState(player.getUniqueId());
-            if (state.isInCombat()) {
+            
+            // Check if combat just expired
+            boolean wasInCombat = state.getCombatStart().isPresent();
+            boolean isInCombat = state.isInCombat();
+            
+            if (wasInCombat && !isInCombat) {
+                // Combat just ended
+                this.showCombatEnd(player);
+                this.combatManager.exitCombat(player.getUniqueId());
+            } else if (isInCombat) {
+                // Still in combat, update notification
                 this.updatePlayerNotification(player);
             } else {
-                // Remove boss bar if player is no longer in combat
+                // Not in combat, remove boss bar if present
                 this.removeBossBar(player.getUniqueId());
             }
         }
