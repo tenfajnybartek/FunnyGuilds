@@ -32,6 +32,25 @@ public class UserPlaceholdersService extends StaticPlaceholdersService<User, Use
                         config.pingFormat), "{PING}", user.getPing()))
                 .property("has-guild", user -> user.hasGuild())
                 .property("guild-position", user -> UserUtils.getUserPosition(plugin.getGuildPermissionChecker(), user))
+                .property("combat-time", user -> {
+                    net.dzikoysk.funnyguilds.feature.combatlog.CombatState state = 
+                        plugin.getCombatManager().getCombatState(user.getUUID());
+                    if (!state.isInCombat()) {
+                        return "0s";
+                    }
+                    return state.getRemainingTime()
+                        .map(duration -> {
+                            long totalSeconds = duration.getSeconds();
+                            long minutes = totalSeconds / 60;
+                            long seconds = totalSeconds % 60;
+                            if (minutes > 0) {
+                                return String.format("%d:%02d", minutes, seconds);
+                            } else {
+                                return String.format("%ds", seconds);
+                            }
+                        })
+                        .orElseGet(() -> "0s");
+                })
                 .rankProperty("position", (rank) -> rank.getPosition(DefaultTops.USER_POINTS_TOP))
                 .rankProperty("points", UserRank::getPoints)
                 .rankProperty("points-format", (UserRank rank) -> FunnyFormatter.format(NumberRange.inRangeToString(rank.getPoints(),

@@ -2,6 +2,8 @@ package net.dzikoysk.funnyguilds.listener;
 
 import net.dzikoysk.funnyguilds.damage.DamageManager;
 import net.dzikoysk.funnyguilds.damage.DamageState;
+import net.dzikoysk.funnyguilds.feature.combatlog.CombatManager;
+import net.dzikoysk.funnyguilds.feature.combatlog.CombatNotificationHandler;
 import net.dzikoysk.funnyguilds.feature.hooks.HookManager;
 import net.dzikoysk.funnyguilds.feature.hooks.worldguard.WorldGuardHook.FriendlyFireStatus;
 import net.dzikoysk.funnyguilds.guild.Guild;
@@ -21,6 +23,12 @@ public class EntityDamage extends AbstractFunnyListener {
 
     @Inject
     private DamageManager damageManager;
+
+    @Inject
+    private CombatManager combatManager;
+
+    @Inject
+    private CombatNotificationHandler combatNotificationHandler;
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
@@ -126,6 +134,30 @@ public class EntityDamage extends AbstractFunnyListener {
 
             DamageState damageState = this.damageManager.getDamageState(victimUser.getUUID());
             damageState.addDamage(attackerUser, event.getDamage());
+
+            // Enter both players into combat if combat log is enabled
+            if (this.config.combatLog.enabled && victim instanceof Player && attacker instanceof Player) {
+                Player victimPlayer = (Player) victim;
+                Player attackerPlayer = attacker;
+                
+                boolean wasInCombat = this.combatManager.isInCombat(victimUser.getUUID());
+                
+                // Enter victim into combat
+                this.combatManager.enterCombat(victimUser, attackerUser, this.config.combatLog.duration);
+                
+                // Enter attacker into combat
+                this.combatManager.enterCombat(attackerUser, victimUser, this.config.combatLog.duration);
+                
+                // Show notification only if entering combat for the first time
+                if (!wasInCombat) {
+                    this.combatNotificationHandler.showCombatStart(victimPlayer, attackerUser);
+                }
+                
+                boolean attackerWasInCombat = this.combatManager.isInCombat(attackerUser.getUUID());
+                if (!attackerWasInCombat) {
+                    this.combatNotificationHandler.showCombatStart(attackerPlayer, victimUser);
+                }
+            }
         });
     }
 

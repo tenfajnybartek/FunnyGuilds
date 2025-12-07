@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
+import net.dzikoysk.funnyguilds.config.sections.CombatLogConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.CommandsConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.HeartConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.MysqlConfiguration;
@@ -668,6 +669,10 @@ public class PluginConfiguration extends OkaeriConfig {
     @Comment("Przykład: 1m30s")
     @CustomKey("rank-farming-consideration-timeout")
     public Duration lastAttackerAsKillerConsiderationTimeout = Duration.ofSeconds(30);
+
+    @Comment("")
+    @Comment("Konfiguracja systemu combat log (antylogout)")
+    public CombatLogConfiguration combatLog = new CombatLogConfiguration();
 
     @PositiveOrZero
     @Comment("")

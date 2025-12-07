@@ -128,6 +128,8 @@ public class FunnyGuilds extends JavaPlugin {
     private FunnyServer funnyServer;
     private GuildPermissionChecker guildPermissionChecker;
     private net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager regionRegenerationManager;
+    private net.dzikoysk.funnyguilds.feature.combatlog.CombatManager combatManager;
+    private net.dzikoysk.funnyguilds.feature.combatlog.CombatNotificationHandler combatNotificationHandler;
 
     private Option<IndividualNameTagManager> individualNameTagManager = Option.none();
     private Option<DummyManager> dummyManager = Option.none();
@@ -264,6 +266,8 @@ public class FunnyGuilds extends JavaPlugin {
         this.guildPermissionChecker = GuildPermissionChecker.create(this);
         this.regionRegenerationManager = new net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager();
         this.regionRegenerationManager.initialize(this);
+        this.combatManager = new net.dzikoysk.funnyguilds.feature.combatlog.CombatManager();
+        this.combatNotificationHandler = new net.dzikoysk.funnyguilds.feature.combatlog.CombatNotificationHandler(this, this.combatManager);
 
         this.prepareScoreboardServices();
 
@@ -354,6 +358,8 @@ public class FunnyGuilds extends JavaPlugin {
             resources.on(GuildEntityHelper.class).assignInstance(this.guildEntityHelper);
             resources.on(DataModel.class).assignInstance(this.dataModel);
             resources.on(net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager.class).assignInstance(this.regionRegenerationManager);
+            resources.on(net.dzikoysk.funnyguilds.feature.combatlog.CombatManager.class).assignInstance(this.combatManager);
+            resources.on(net.dzikoysk.funnyguilds.feature.combatlog.CombatNotificationHandler.class).assignInstance(this.combatNotificationHandler);
         });
 
         MetricsCollector collector = new MetricsCollector(this);
@@ -380,6 +386,9 @@ public class FunnyGuilds extends JavaPlugin {
             oldRecalcTask.cancel();
         }
 
+        // Start combat notification handler
+        this.combatNotificationHandler.start();
+
         try {
             this.funnyCommands = FunnyCommandsConfiguration.createFunnyCommands(this);
         }
@@ -403,7 +412,8 @@ public class FunnyGuilds extends JavaPlugin {
                     .add(PlayerLogin.class)
                     .add(PlayerQuit.class)
                     .add(GuildHeartProtectionHandler.class)
-                    .add(TntProtection.class);
+                    .add(TntProtection.class)
+                    .add(net.dzikoysk.funnyguilds.feature.combatlog.CombatCommandBlocker.class);
 
             if (this.pluginConfiguration.regionsEnabled && this.pluginConfiguration.blockFlow) {
                 setBuilder.add(BlockFlow.class);
@@ -500,6 +510,11 @@ public class FunnyGuilds extends JavaPlugin {
         BukkitTask recalcTask = this.rankRecalculationTask.getAndSet(null);
         if (recalcTask != null) {
             recalcTask.cancel();
+        }
+
+        // Stop combat notification handler
+        if (this.combatNotificationHandler != null) {
+            this.combatNotificationHandler.stop();
         }
 
         this.dataModel.save(false);
@@ -658,6 +673,14 @@ public class FunnyGuilds extends JavaPlugin {
 
     public DamageManager getDamageManager() {
         return this.damageManager;
+    }
+
+    public net.dzikoysk.funnyguilds.feature.combatlog.CombatManager getCombatManager() {
+        return this.combatManager;
+    }
+
+    public net.dzikoysk.funnyguilds.feature.combatlog.CombatNotificationHandler getCombatNotificationHandler() {
+        return this.combatNotificationHandler;
     }
 
     public RegionManager getRegionManager() {

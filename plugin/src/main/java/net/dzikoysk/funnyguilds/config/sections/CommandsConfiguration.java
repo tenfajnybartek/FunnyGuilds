@@ -72,6 +72,8 @@ public class CommandsConfiguration extends OkaeriConfig {
     public FunnyCommand panel = new FunnyCommand("panel", Collections.singletonList("zarzadzaj"));
     @Comment("")
     public FunnyCommand permissions = new FunnyCommand("uprawnienia", Arrays.asList("perms", "permissions"));
+    @Comment("")
+    public FunnyCommand combattime = new FunnyCommand("combattime", Collections.singletonList("ct"));
 
     @Comment
     @Comment("Komendy administratora")

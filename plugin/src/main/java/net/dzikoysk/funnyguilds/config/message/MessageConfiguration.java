@@ -791,6 +791,15 @@ public class MessageConfiguration extends OkaeriConfig implements MessageReposit
     public String loginNickTooLong = "&cNick jest za dlugi!";
     public String loginNickInvalid = "&cNick zawiera niedozwolone znaki!";
 
+    @Comment("")
+    @Comment("Wiadomości związane z systemem combat log")
+    public String combatLogActive = "&c⚔ ANTYLOGOUT: &f{TIME}";
+    public String combatLogStart = "&c⚔ Rozpoczęto walkę z {ATTACKER}!";
+    public String combatLogEnd = "&a✔ Walka zakończona! Możesz się wylogować.";
+    public SendableMessage combatLogCommandBlocked = ChatHolder.message("&cNie możesz użyć komendy &7/{COMMAND} &cpodczas walki! &7(pozostało: &f{TIME}&7)");
+    public SendableMessage combatLogNotInCombat = ChatHolder.message("&7Nie jesteś w trakcie walki!");
+    public SendableMessage combatLogTimeRemaining = ChatHolder.message("&7Pozostały czas walki: &c{TIME} &7(przeciwnik: &c{ATTACKER}&7)");
+
     @Override
     public OkaeriConfig load() throws OkaeriException {
         super.load();
