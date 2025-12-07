@@ -27,14 +27,40 @@ public class PlayerQuit extends AbstractFunnyListener {
     @Inject
     private CombatManager combatManager;
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onKick(PlayerKickEvent event) {
         this.handleQuit(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         this.handleQuit(event.getPlayer());
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onQuitEarly(PlayerQuitEvent event) {
+        this.handleCombatLogout(event.getPlayer());
+    }
+    
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onKickEarly(PlayerKickEvent event) {
+        this.handleCombatLogout(event.getPlayer());
+    }
+    
+    private void handleCombatLogout(Player player) {
+        if (!this.config.combatLog.enabled) {
+            return;
+        }
+        
+        this.userManager.findByUuid(player.getUniqueId()).peek(user -> {
+            CombatState combatState = this.combatManager.getCombatState(user.getUUID());
+            
+            if (combatState.isInCombat()) {
+                // Kill the player before they disconnect
+                // This will trigger PlayerDeathEvent which handles death messages, drops, etc.
+                player.setHealth(0.0);
+            }
+        });
     }
 
     private void handleQuit(Player player) {
@@ -42,7 +68,7 @@ public class PlayerQuit extends AbstractFunnyListener {
             UserCache cache = user.getCache();
             DamageState damageState = damageManager.getDamageState(user.getUUID());
 
-            // Check for combat log logout
+            // Check for combat log logout (for stats tracking only, death is handled in handleCombatLogout)
             CombatState combatState = this.combatManager.getCombatState(user.getUUID());
             boolean inCombat = combatState.isInCombat();
 
