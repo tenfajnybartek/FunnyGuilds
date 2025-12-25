@@ -1,5 +1,10 @@
 package net.dzikoysk.funnyguilds.config;
 
+import eu.okaeri.configs.OkaeriConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.dzikoysk.funnyguilds.config.file.CommandsConfig;
 import net.dzikoysk.funnyguilds.config.file.CoreConfig;
 import net.dzikoysk.funnyguilds.config.file.DatabaseConfig;
@@ -94,18 +99,37 @@ public class PluginConfigurationContainer {
 
     /**
      * Reloads all configuration files.
+     * Returns a list of config names that failed to reload.
+     *
+     * @param logger The logger to use for error messages
+     * @return List of configuration names that failed to reload, empty if all succeeded
      */
-    public void reloadAll() {
-        this.core.load();
-        this.database.load();
-        this.panel.load();
-        this.gameplay.load();
-        this.diplomacy.load();
-        this.security.load();
-        this.display.load();
-        this.commands.load();
-        this.events.load();
-        this.rankSystem.load();
+    public List<String> reloadAll(Logger logger) {
+        List<String> failed = new ArrayList<>();
+        
+        safeReload("core", this.core, logger, failed);
+        safeReload("database", this.database, logger, failed);
+        safeReload("panel", this.panel, logger, failed);
+        safeReload("gameplay", this.gameplay, logger, failed);
+        safeReload("diplomacy", this.diplomacy, logger, failed);
+        safeReload("security", this.security, logger, failed);
+        safeReload("display", this.display, logger, failed);
+        safeReload("commands", this.commands, logger, failed);
+        safeReload("events", this.events, logger, failed);
+        safeReload("rankSystem", this.rankSystem, logger, failed);
+        
+        return failed;
+    }
+
+    private void safeReload(String name, OkaeriConfig config, Logger logger, List<String> failed) {
+        try {
+            config.load();
+        } catch (Exception e) {
+            failed.add(name);
+            if (logger != null) {
+                logger.log(Level.SEVERE, "Failed to reload configuration: " + name, e);
+            }
+        }
     }
 
 }
