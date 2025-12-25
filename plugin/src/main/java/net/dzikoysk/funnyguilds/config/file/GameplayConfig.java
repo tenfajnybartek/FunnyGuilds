@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
 import net.dzikoysk.funnyguilds.config.DefaultRegex;
 import net.dzikoysk.funnyguilds.config.FunnyPattern;
+import net.dzikoysk.funnyguilds.config.PluginConfiguration;
 import net.dzikoysk.funnyguilds.config.RawString;
 import net.dzikoysk.funnyguilds.config.sections.HeartConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.TntProtectionConfiguration;
@@ -287,22 +288,7 @@ public class GameplayConfig extends OkaeriConfig {
     public List<Material> blockedInteract = Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST);
 
     @Comment("")
-    public BlockTeleportOnRegion blockTeleportOnRegion = new BlockTeleportOnRegion();
-
-    public static class BlockTeleportOnRegion extends OkaeriConfig {
-
-        @Comment("Czy ma być blokowana teleportacja na teren neutralnej gildii")
-        public boolean neutral = true;
-
-        @Comment("")
-        @Comment("Czy ma być blokowana teleportacja na teren wrogiej gildii")
-        public boolean enemy = true;
-
-        @Comment("")
-        @Comment("Czy ma być blokowana teleportacja na teren sojuszniczej gildii")
-        public boolean ally = false;
-
-    }
+    public PluginConfiguration.BlockTeleportOnRegion blockTeleportOnRegion = new PluginConfiguration.BlockTeleportOnRegion();
 
     @Exclude
     public boolean eventTeleport = false;

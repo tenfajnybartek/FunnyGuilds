@@ -104,6 +104,7 @@ public class FunnyGuilds extends JavaPlugin {
     private static FunnyGuildsLogger logger;
 
     private final File pluginConfigurationFile = new File(this.getDataFolder(), "config.yml");
+    private final File splitConfigurationDir = new File(this.getDataFolder(), "config");
     private final File tablistConfigurationFile = new File(this.getDataFolder(), "tablist.yml");
     private final File pluginLanguageFolderFile = new File(this.getDataFolder(), "lang");
     private final File pluginDataFolderFile = new File(this.getDataFolder(), "data");
@@ -193,12 +194,13 @@ public class FunnyGuilds extends JavaPlugin {
         }
 
         try {
-            this.pluginConfiguration = ConfigurationFactory.createPluginConfiguration(this.pluginConfigurationFile);
+            // Use split configuration files from config/ directory
+            this.pluginConfiguration = ConfigurationFactory.createSplitPluginConfiguration(this.splitConfigurationDir, this.getLogger());
             this.tablistConfiguration = ConfigurationFactory.createTablistConfiguration(this.tablistConfigurationFile);
         }
         catch (Exception exception) {
             logger.error("Could not load plugin configuration from files: " + 
-                this.pluginConfigurationFile.getAbsolutePath() + ", " + 
+                this.splitConfigurationDir.getAbsolutePath() + ", " + 
                 this.tablistConfigurationFile.getAbsolutePath(), exception);
             this.shutdown("Critical error has been encountered!");
             return;

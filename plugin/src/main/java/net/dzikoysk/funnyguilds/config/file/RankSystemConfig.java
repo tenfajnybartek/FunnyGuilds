@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
 import net.dzikoysk.funnyguilds.config.NumberRange;
+import net.dzikoysk.funnyguilds.config.PluginConfiguration;
 import net.dzikoysk.funnyguilds.config.RawString;
 import net.dzikoysk.funnyguilds.rank.RankSystem;
 import net.dzikoysk.funnyguilds.shared.bukkit.ItemUtils;
@@ -102,19 +103,7 @@ public class RankSystemConfig extends OkaeriConfig {
 
     // ===== Damage Tracking =====
 
-    public DamageTracking damageTracking = new DamageTracking();
-
-    public static class DamageTracking extends OkaeriConfig {
-
-        @Comment("Czas po którym zadane obrażenia, stają się \"przestarzałe\"")
-        public Duration expireTime = Duration.ofMinutes(1);
-
-        @Min(-1)
-        @Comment("Jak długa ma być historia zadanych obrażeń.")
-        @Comment("Wstaw -1 jeśli ma być nieskończona.")
-        public int maxTracks = 30;
-
-    }
+    public PluginConfiguration.DamageTracking damageTracking = new PluginConfiguration.DamageTracking();
 
     // ===== Assist System =====
 

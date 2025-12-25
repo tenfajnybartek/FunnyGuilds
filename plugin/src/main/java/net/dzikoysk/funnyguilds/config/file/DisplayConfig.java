@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import net.dzikoysk.funnyguilds.config.PluginConfiguration;
 import net.dzikoysk.funnyguilds.config.RangeFormatting;
 import net.dzikoysk.funnyguilds.config.RawString;
 import net.dzikoysk.funnyguilds.config.sections.ScoreboardConfiguration;
@@ -114,22 +115,7 @@ public class DisplayConfig extends OkaeriConfig {
     // ===== Lives Symbol =====
 
     @Comment("")
-    public LivesRepeatingSymbol livesRepeatingSymbol = new LivesRepeatingSymbol();
-
-    public static class LivesRepeatingSymbol extends OkaeriConfig {
-
-        @Comment("Symbol (lub słowo), który ma być powtarzany przy użyciu placeholdera LIVES-SYMBOL lub LIVES-SYMBOL-ALL")
-        public RawString full = new RawString("&c\u2764");
-
-        @Comment("")
-        @Comment("Symbol (lub słowo), który ma być powtarzany przy użyciu placeholdera LIVES-SYMBOL")
-        public RawString empty = new RawString("&8\u2764");
-
-        @Comment("")
-        @Comment("Symbol (lub słowo), który ma być pokazywany na końcu placeholdera LIVES-SYMBOL, kiedy gildia posiada więcej żyć niz podstawowe (war-lives)")
-        public RawString more = new RawString("&a+");
-
-    }
+    public PluginConfiguration.LivesRepeatingSymbol livesRepeatingSymbol = new PluginConfiguration.LivesRepeatingSymbol();
 
     // ===== Chat Formatting =====
 
@@ -208,59 +194,7 @@ public class DisplayConfig extends OkaeriConfig {
     // ===== Relational Tags =====
 
     @Comment("")
-    public RelationalTag relationalTag = new RelationalTag();
-
-    public static class RelationalTag extends OkaeriConfig {
-
-        @Comment("Wygląd tagu osób w tej samej gildii")
-        public RawString our = new RawString("&a{TAG}&f");
-
-        @Comment("")
-        @Comment("Wygląd tagu gildii sojuszniczej")
-        public RawString allies = new RawString("&6{TAG}&f");
-
-        @Comment("")
-        @Comment("Wygląd tagu wrogiej gildii")
-        public RawString enemies = new RawString("&c{TAG}&f");
-
-        @Comment("")
-        @Comment("Wygląd tagu gildii neutralnej, widziany również przez graczy bez gildii")
-        public RawString other = new RawString("&7{TAG}&f");
-
-        public String chooseTag(@Nullable Guild guild, @Nullable Guild targetGuild) {
-            if (targetGuild == null) {
-                return "";
-            }
-
-            if (guild == null) {
-                return this.other.getValue();
-            }
-
-            if (guild.equals(targetGuild)) {
-                return this.our.getValue();
-            }
-
-            if (guild.isAlly(targetGuild)) {
-                return this.allies.getValue();
-            }
-
-            if (guild.isEnemy(targetGuild) || targetGuild.isEnemy(guild)) {
-                return this.enemies.getValue();
-            }
-
-            return this.other.getValue();
-        }
-
-        public String chooseAndPrepareTag(@Nullable Guild guild, @Nullable Guild targetGuild) {
-            if (targetGuild == null) {
-                return "";
-            }
-
-            return FunnyFormatter.of("{TAG}", targetGuild.getTag())
-                    .replace(this.chooseTag(guild, targetGuild));
-        }
-
-    }
+    public PluginConfiguration.RelationalTag relationalTag = new PluginConfiguration.RelationalTag();
 
     // ===== Player Info =====
 
@@ -332,94 +266,6 @@ public class DisplayConfig extends OkaeriConfig {
 
     @Comment("")
     @Comment("Konfiguracja hooku do pluginy 'dynmap'")
-    public DynmapHook dynmapHook = new DynmapHook();
-
-    public static class DynmapHook extends OkaeriConfig {
-
-        @Comment("")
-        @Comment("Co ile ticków etykiety znaczników mają być odświeżane (20 ticków = 1 sekunda)")
-        public long updateInterval = 60 * 20;
-
-        @Comment("")
-        @Comment("Oznaczenie listy gildii na mapie")
-        public String guildSetLabel = "Gildie";
-
-        @Comment("")
-        public Center center = new Center();
-
-        public static class Center extends OkaeriConfig {
-
-            @Comment("Czy wskaźnik środka gildii ma być widoczny na mapie")
-            public boolean enabled = true;
-
-            @Comment("Czy wskaźnik środka powinien używać współrzędnych Y najwyższego punktu zamiast rzeczywistej wysokości")
-            public boolean hideCenterY = false;
-
-            @Comment("")
-            @Comment("Etykieta środka gildii")
-            public String label = "{NAME} ({TAG})";
-
-            @Comment("")
-            @Comment("Ikona oznaczenia środka gildii")
-            public String icon = "shield";
-
-        }
-
-        @Comment("")
-        public Area area = new Area();
-
-        public static class Area extends OkaeriConfig {
-
-            @Comment("Czy obszar gildii ma być widoczny na mapie")
-            public boolean enabled = true;
-
-            @Comment("")
-            @Comment("Etykieta obszaru gildii")
-            public String label = "<b>{NAME} ({TAG})</b><br><br>" +
-                    "<b>Właściciel:</b> {OWNER}<br>" +
-                    "<b>Gracze (ONL/ALL):</b> {MEMBERS-ONLINE}/{MEMBERS-ALL}<br><br>" +
-                    "<b>Punkty (Średnio):</b> {AVG-POINTS}";
-
-            @Comment("")
-            @Comment("Konfiguracja wyglądu wypełnienia obszaru gildii")
-            public Fill fill = new Fill();
-
-            public static class Fill extends OkaeriConfig {
-
-                @Comment("Przezroczystość wypełnienia:")
-                @Comment(" > 0 - całkowicie przezroczyste")
-                @Comment(" > 1 - całkowicie wypełnione")
-                public double opacity = 0.6;
-
-                @Comment("")
-                @Comment("Kolor wypełnienia")
-                public Color color = Color.fromRGB(25, 25, 25);
-
-            }
-
-            @Comment("")
-            @Comment("Konfiguracja linii (granic) obszaru gildii")
-            public Line line = new Line();
-
-            public static class Line extends OkaeriConfig {
-
-                @Comment("Przezroczystość linii:")
-                @Comment(" > 0 - całkowicie przezroczyste")
-                @Comment(" > 1 - całkowicie wypełnione")
-                public double opacity = 1;
-
-                @Comment("")
-                @Comment("Grubość linii (w pikselach)")
-                public int weight = 3;
-
-                @Comment("")
-                @Comment("Kolor linii")
-                public Color color = Color.fromRGB(10, 10, 10);
-
-            }
-
-        }
-
-    }
+    public PluginConfiguration.DynmapHook dynmapHook = new PluginConfiguration.DynmapHook();
 
 }

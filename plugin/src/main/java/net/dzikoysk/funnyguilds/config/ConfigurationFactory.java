@@ -78,6 +78,18 @@ public final class ConfigurationFactory {
         });
     }
 
+    /**
+     * Creates a PluginConfiguration that loads from split configuration files in a directory.
+     * This is the preferred method for new installations as it uses separate config files.
+     *
+     * @param configDir The directory containing split configuration files (plugins/FunnyGuilds/config/)
+     * @param logger The logger for configuration loading
+     * @return A PluginConfiguration object that loads from split files
+     */
+    public static PluginConfiguration createSplitPluginConfiguration(File configDir, Logger logger) {
+        return new SplitPluginConfiguration(configDir, logger);
+    }
+
     public static TablistConfiguration createTablistConfiguration(File tablistConfigurationFile) {
         return ConfigManager.create(TablistConfiguration.class, (it) -> {
             it.withConfigurer(new OkaeriValidator(new YamlBukkitConfigurer(), true), new SerdesCommons());
