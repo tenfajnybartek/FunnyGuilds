@@ -22,8 +22,10 @@ class RankUtilsTest : FunnyGuildsSpec() {
 
         rankRecalculationTask.run()
 
-        config.gtopPoints = RawString(" {POINTS-FORMAT}")
-        config.pointsFormat = ArrayList(listOf(RangeFormatting(0, Int.MAX_VALUE, "{POINTS}")))
+        config.top.format.gtop = RawString(" {VALUE-FORMAT}")
+        config.top.format.gtopValueFormatting = mapOf(
+            "avg_points" to listOf(RangeFormatting(0, Int.MAX_VALUE, "{VALUE}"))
+        )
         config.gtopOnline = RawString("")
         config.gtopOffline = RawString("")
 
