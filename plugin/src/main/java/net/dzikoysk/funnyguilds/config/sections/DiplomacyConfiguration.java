@@ -22,7 +22,7 @@ public class DiplomacyConfiguration extends OkaeriConfig {
 
     @Comment("")
     @Comment("Ilość wierszy w GUI głównym (1-6)")
-    public int rows = 4;
+    public int rows = 6;
 
     @Comment("")
     @Comment("Konfiguracja itemu listy sojuszy")

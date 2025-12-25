@@ -14,6 +14,7 @@ import net.dzikoysk.funnyguilds.shared.bukkit.ChatUtils;
 import net.dzikoysk.funnyguilds.shared.bukkit.ItemBuilder;
 import net.dzikoysk.funnyguilds.shared.formatter.FunnyFormatter;
 import net.dzikoysk.funnyguilds.user.User;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -67,7 +68,7 @@ public class VaultItemsGui {
 
         GuiWindow gui = new GuiWindow(title, ROWS);
 
-        // Display items
+        // Display items from vault
         List<ItemStack> items = vault.getItems();
         int startIndex = currentPage * ITEMS_PER_PAGE;
         int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, items.size());
@@ -115,6 +116,15 @@ public class VaultItemsGui {
             });
         }
 
+        // Add click handlers for empty slots (for depositing items)
+        for (int slot = endIndex - startIndex; slot < ITEMS_PER_PAGE; slot++) {
+            final int emptySlot = slot;
+            gui.setItem(slot, null, event -> {
+                event.setCancelled(true);
+                handleDeposit(event.getCursor(), currentPage);
+            });
+        }
+
         // Previous page button
         if (currentPage > 0) {
             ItemStack prevItem = new ItemBuilder(itemsConfig.prevPageMaterial)
@@ -153,6 +163,64 @@ public class VaultItemsGui {
         });
 
         gui.open(this.player);
+    }
+
+    private void handleDeposit(ItemStack cursorItem, int currentPage) {
+        if (cursorItem == null || cursorItem.getType() == Material.AIR) {
+            return;
+        }
+
+        // Check permission to deposit
+        if (!canDeposit()) {
+            this.messageService.getMessage(cfg -> cfg.vaultNoPermissionDeposit)
+                    .receiver(this.player)
+                    .send();
+            return;
+        }
+
+        GuildVault vault = this.vaultManager.getVault(this.guild);
+        
+        // Check vault capacity
+        int maxItems = this.config.guildVault.maxItemPages * ITEMS_PER_PAGE;
+        if (vault.getItemCount() >= maxItems) {
+            this.messageService.getMessage(cfg -> cfg.vaultFull)
+                    .receiver(this.player)
+                    .send();
+            return;
+        }
+
+        // Add item to vault
+        vault.addItem(cursorItem.clone());
+        
+        // Remove item from cursor
+        this.player.setItemOnCursor(null);
+        
+        // Log event
+        this.eventLogManager.logEvent(this.guild, EventLogType.VAULT_DEPOSIT_ITEM,
+                this.user, cursorItem.getType().name(), 
+                cursorItem.getAmount() + "x " + cursorItem.getType().name());
+
+        this.messageService.getMessage(cfg -> cfg.vaultDepositItem)
+                .receiver(this.player)
+                .send();
+
+        // Refresh GUI
+        new VaultItemsGui(this.plugin, this.config, this.messageService, this.vaultManager,
+                this.eventLogManager, this.guild, this.user, this.player, currentPage).open();
+    }
+
+    private boolean canDeposit() {
+        GuildVaultConfiguration.VaultPermissions perms = this.config.guildVault.permissions;
+        
+        if (this.guild.isOwner(this.user)) {
+            return true;
+        }
+        
+        if (this.guild.isDeputy(this.user) && perms.deputyFullAccess) {
+            return true;
+        }
+        
+        return perms.memberCanDepositItems;
     }
 
     private boolean canWithdraw() {
