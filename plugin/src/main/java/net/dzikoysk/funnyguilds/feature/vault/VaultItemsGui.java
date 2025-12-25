@@ -126,7 +126,9 @@ public class VaultItemsGui {
         }
 
         // Add click handlers for empty slots (for depositing items)
-        for (int slot = endIndex - startIndex; slot < ITEMS_PER_PAGE; slot++) {
+        // Calculate the number of items displayed on this page
+        int itemsOnPage = Math.max(0, endIndex - startIndex);
+        for (int slot = itemsOnPage; slot < ITEMS_PER_PAGE; slot++) {
             gui.setItem(slot, null, event -> {
                 event.setCancelled(true);
                 // Try multiple sources for the cursor item (Paper/Spigot compatibility)
