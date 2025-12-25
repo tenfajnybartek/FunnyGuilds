@@ -66,11 +66,7 @@ public class PlaceholderAPIHook extends AbstractPluginHook {
                 return this.rankPlaceholdersService.formatTopPosition("{" + identifier.toUpperCase(Locale.ROOT) + "}", user);
             }
             else if (lowerIdentifier.contains("top-")) {
-                String temp = this.rankPlaceholdersService.formatTop("{" + identifier.toUpperCase(Locale.ROOT) + "}", user);
-                if (this.plugin.getPluginConfiguration().top.enableLegacyPlaceholders) {
-                    temp = this.rankPlaceholdersService.formatRank(temp, user);
-                }
-                return temp;
+                return this.rankPlaceholdersService.formatTop("{" + identifier.toUpperCase(Locale.ROOT) + "}", user);
             }
             else {
                 return this.plugin.getTablistPlaceholdersService().formatIdentifier(user, identifier, user);

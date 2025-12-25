@@ -213,16 +213,4 @@ public class UserManager {
         return this.findByName(nickname, ignoreCase).isPresent();
     }
 
-    /**
-     * Gets the user manager.
-     *
-     * @return the user manager
-     * @deprecated for removal in the future, in favour of {@link FunnyGuilds#getUserManager()}
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "5.0")
-    public static UserManager getInstance() {
-        return FunnyGuilds.getInstance().getUserManager();
-    }
-
 }

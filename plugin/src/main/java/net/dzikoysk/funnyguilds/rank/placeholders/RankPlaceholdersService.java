@@ -22,7 +22,6 @@ import net.dzikoysk.funnyguilds.user.UserRankManager;
 import net.dzikoysk.funnyguilds.user.top.UserTop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextReplacementConfig;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import panda.std.Option;
@@ -33,7 +32,6 @@ public class RankPlaceholdersService implements PlaceholdersService<User> {
 
     private static final Pattern TOP_PATTERN = Pattern.compile("\\{(PTOP|GTOP)-([A-Za-z_]+)-([0-9]+)}");
     private static final Pattern TOP_POSITION_PATTERN = Pattern.compile("\\{(POSITION|G-POSITION)-([A-Za-z_]+)}");
-    private static final Pattern LEGACY_TOP_PATTERN = Pattern.compile("\\{(PTOP|GTOP)-([0-9]+)}");
 
     private final PluginConfiguration config;
     private final TablistConfiguration tablistConfig;
@@ -70,10 +68,6 @@ public class RankPlaceholdersService implements PlaceholdersService<User> {
 
         text = this.formatTop(text, targetUser);
         text = this.formatTopPosition(text, targetUser);
-
-        if (this.config.top.enableLegacyPlaceholders) {
-            text = this.formatRank(text, targetUser);
-        }
 
         return text;
     }
@@ -226,97 +220,6 @@ public class RankPlaceholdersService implements PlaceholdersService<User> {
             }
 
             return FunnyFormatter.format(text, placeholder, guild.getRank().getPosition(comparatorType));
-        }
-
-        return text;
-    }
-
-    // TODO Migrate all {PTOP/GTOP-x} placeholders to new {PTOP/GTOP-type-x} and remove this method
-
-    /**
-     * Format legacy top placeholders (PTOP/GTOP-x) in text
-     *
-     * @param text       text to format
-     * @param targetUser user for which text will be formatted
-     * @return formatted text
-     */
-    @Deprecated
-    @ApiStatus.ScheduledForRemoval(inVersion = "4.11.0")
-    public String formatRank(String text, @Nullable User targetUser) {
-        if (text == null) {
-            return "";
-        }
-
-        if (!text.contains("TOP-")) {
-            return text;
-        }
-
-        Matcher matcher = LEGACY_TOP_PATTERN.matcher(text);
-        if (!matcher.find()) {
-            return text;
-        }
-
-        String topType = matcher.group(1);
-        String indexString = matcher.group(2);
-
-        Option<Integer> indexOption = Option.attempt(NumberFormatException.class, () -> Integer.parseInt(indexString));
-        if (indexOption.isEmpty()) {
-            FunnyGuilds.getPluginLogger().error(indexString + "is invalid " + topType + " index!");
-            return text;
-        }
-
-        int index = indexOption.get();
-        if (index < 1) {
-            FunnyGuilds.getPluginLogger().error("Index in " + topType + " must be greater or equal to 1!");
-            return text;
-        }
-
-        if (topType.equalsIgnoreCase("PTOP")) {
-            String placeholder = "{PTOP-" + index + "}";
-            String noValue = this.messageService.get(targetUser, config -> config.ptopNoValue);
-
-            Option<User> userOption = this.userRankManager.getUser(DefaultTops.USER_POINTS_TOP, index);
-            if (userOption.isEmpty()) {
-                return FunnyFormatter.format(text, placeholder, noValue);
-            }
-
-            User user = userOption.get();
-            int points = user.getRank().getPoints();
-            String pointsFormat = this.config.ptopPoints.getValue();
-
-            if (!pointsFormat.isEmpty()) {
-                FunnyFormatter formatter = new FunnyFormatter()
-                        .register("{POINTS-FORMAT}", NumberRange.inRangeToString(points, this.config.pointsFormat))
-                        .register("{POINTS}", points);
-
-                pointsFormat = formatter.format(pointsFormat);
-            }
-
-            return this.formatUserRank(text, placeholder, user, pointsFormat);
-        }
-
-        if (topType.equalsIgnoreCase("GTOP")) {
-            String placeholder = "{GTOP-" + index + "}";
-            String noValue = this.messageService.get(targetUser, config -> config.gtopNoValue);
-
-            Option<Guild> guildOption = this.guildRankManager.getGuild(DefaultTops.GUILD_AVG_POINTS_TOP, index);
-            if (guildOption.isEmpty()) {
-                return FunnyFormatter.format(text, placeholder, noValue);
-            }
-
-            Guild guild = guildOption.get();
-            int points = guild.getRank().getAveragePoints();
-            String pointsFormat = this.config.gtopPoints.getValue();
-
-            if (!pointsFormat.isEmpty()) {
-                FunnyFormatter formatter = new FunnyFormatter()
-                        .register("{POINTS-FORMAT}", NumberRange.inRangeToString(points, this.config.pointsFormat))
-                        .register("{POINTS}", points);
-
-                pointsFormat = formatter.format(pointsFormat);
-            }
-
-            return this.formatGuildRank(text, placeholder, targetUser, guild, pointsFormat);
         }
 
         return text;
