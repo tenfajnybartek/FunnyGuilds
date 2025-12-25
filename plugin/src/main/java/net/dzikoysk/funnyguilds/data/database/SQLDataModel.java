@@ -11,6 +11,7 @@ import net.dzikoysk.funnyguilds.data.database.serializer.DatabaseGuildSerializer
 import net.dzikoysk.funnyguilds.data.database.serializer.DatabaseMemberPermissionsSerializer;
 import net.dzikoysk.funnyguilds.data.database.serializer.DatabaseRegionSerializer;
 import net.dzikoysk.funnyguilds.data.database.serializer.DatabaseUserSerializer;
+import net.dzikoysk.funnyguilds.data.database.serializer.DatabaseVaultSerializer;
 import net.dzikoysk.funnyguilds.feature.scoreboard.ScoreboardGlobalUpdateSyncTask;
 import net.dzikoysk.funnyguilds.guild.Guild;
 import net.dzikoysk.funnyguilds.guild.GuildManager;
@@ -29,6 +30,7 @@ public class SQLDataModel implements DataModel {
     private final SQLTable guildsTable;
     private final SQLTable regionsTable;
     private final SQLTable memberPermissionsTable;
+    private final SQLTable vaultsTable;
 
 
     public SQLDataModel(FunnyGuilds plugin) {
@@ -39,6 +41,7 @@ public class SQLDataModel implements DataModel {
         this.guildsTable = new SQLTable(this.pluginConfiguration.mysql.guildsTableName);
         this.regionsTable = new SQLTable(this.pluginConfiguration.mysql.regionsTableName);
         this.memberPermissionsTable = new SQLTable(this.pluginConfiguration.mysql.memberPermissionsTableName);
+        this.vaultsTable = new SQLTable(this.pluginConfiguration.mysql.guildsTableName + "_vaults");
 
         this.prepareTables();
     }
@@ -91,6 +94,12 @@ public class SQLDataModel implements DataModel {
         this.memberPermissionsTable.add("changed_by", SQLType.VARCHAR, 36);
         this.memberPermissionsTable.add("changed_at", SQLType.BIGINT);
         this.memberPermissionsTable.setPrimaryKey("id");
+        
+        // Vaults table
+        this.vaultsTable.add("guild_uuid", SQLType.VARCHAR, 36, true);
+        this.vaultsTable.add("balance", SQLType.DOUBLE, true);
+        this.vaultsTable.add("items", SQLType.LONGTEXT);
+        this.vaultsTable.setPrimaryKey("guild_uuid");
     }
 
     public void load() throws SQLException {
@@ -98,6 +107,7 @@ public class SQLDataModel implements DataModel {
         createTableIfNotExists(this.regionsTable);
         createTableIfNotExists(this.guildsTable);
         createTableIfNotExists(this.memberPermissionsTable);
+        createTableIfNotExists(this.vaultsTable);
 
         this.loadUsers();
         this.loadRegions();
@@ -155,6 +165,9 @@ public class SQLDataModel implements DataModel {
 
         // Load member permissions for all guilds
         DatabaseMemberPermissionsSerializer.loadAllPermissions(this.memberPermissionsTable, guildManager);
+        
+        // Load vaults for all guilds
+        DatabaseVaultSerializer.loadAllVaults(this.vaultsTable);
 
         guildManager.getGuilds().stream()
                 .filter(guild -> guild.getOwner() == null)
@@ -192,6 +205,9 @@ public class SQLDataModel implements DataModel {
                     DatabaseGuildSerializer.serialize(guild);
                     DatabaseMemberPermissionsSerializer.savePermissions(this.memberPermissionsTable, guild);
                 });
+        
+        // Save all vaults (check dirty flag internally)
+        DatabaseVaultSerializer.saveAllVaults(this.vaultsTable, ignoreNotChanged);
 
         if (!this.plugin.getPluginConfiguration().regionsEnabled) {
             return;
@@ -216,6 +232,10 @@ public class SQLDataModel implements DataModel {
     
     public SQLTable getMemberPermissionsTable() {
         return this.memberPermissionsTable;
+    }
+    
+    public SQLTable getVaultsTable() {
+        return this.vaultsTable;
     }
 
     private static void createTableIfNotExists(SQLTable table) {

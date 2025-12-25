@@ -4,8 +4,10 @@ public enum SQLType {
 
     INT("int"),
     BIGINT("bigint"),
+    DOUBLE("double"),
     VARCHAR("varchar"),
     TEXT("text"),
+    LONGTEXT("longtext"),
     BOOLEAN("boolean");
 
     private final String type;

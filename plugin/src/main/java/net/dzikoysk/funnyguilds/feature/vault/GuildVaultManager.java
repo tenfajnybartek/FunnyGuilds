@@ -1,5 +1,6 @@
 package net.dzikoysk.funnyguilds.feature.vault;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -49,8 +50,8 @@ public class GuildVaultManager {
     /**
      * Gets all vaults for persistence.
      */
-    public Map<UUID, GuildVault> getAllVaults() {
-        return new HashMap<>(this.vaults);
+    public Collection<GuildVault> getAllVaults() {
+        return this.vaults.values();
     }
 
     /**
