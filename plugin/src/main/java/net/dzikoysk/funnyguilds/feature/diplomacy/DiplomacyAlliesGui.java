@@ -101,7 +101,7 @@ public class DiplomacyAlliesGui {
 
                 if (event.getClick() == ClickType.LEFT) {
                     // Toggle ally PvP
-                    if (!this.config.allyPvP) {
+                    if (!this.config.damageAlly) {
                         this.messageService.getMessage(cfg -> cfg.generalAllyPvpDisabled)
                                 .receiver(this.player)
                                 .send();
