@@ -2,6 +2,7 @@ package net.dzikoysk.funnyguilds.feature.gui;
 
 import net.dzikoysk.funnyguilds.listener.AbstractFunnyListener;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -30,10 +31,14 @@ public class GuiActionHandler extends AbstractFunnyListener {
             return;
         }
         
-        // If clicking in player's own inventory, allow it for item pickup
+        // If clicking in player's own inventory
         if (event.getClickedInventory().getType() == InventoryType.PLAYER) {
-            // Don't cancel - let the player pick up items
-            // But if they're holding an item on cursor, we want to handle deposit
+            // Handle SHIFT+click to deposit items into vault
+            if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
+                // Let the FunnyHolder handle shift-click from player inventory
+                funnyHolder.handleShiftClick(event);
+            }
+            // Don't cancel non-shift clicks - let the player pick up items
             return;
         }
 

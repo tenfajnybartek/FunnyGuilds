@@ -69,6 +69,11 @@ public class VaultItemsGui {
 
         GuiWindow gui = new GuiWindow(title, ROWS);
 
+        // Set shift-click handler for depositing items from player inventory
+        gui.setShiftClickHandler(event -> {
+            handleShiftClickDeposit(event, currentPage);
+        });
+
         // Display items from vault
         List<ItemStack> items = vault.getItems();
         int startIndex = currentPage * ITEMS_PER_PAGE;
@@ -220,6 +225,62 @@ public class VaultItemsGui {
         // Clear cursor directly through event to avoid sync issues
         event.getView().setCursor(null);
         
+        // Schedule GUI refresh on next tick
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
+            new VaultItemsGui(this.plugin, this.config, this.messageService, this.vaultManager,
+                    this.eventLogManager, this.guild, this.user, this.player, currentPage).open();
+        });
+    }
+
+    private void handleShiftClickDeposit(InventoryClickEvent event, int currentPage) {
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) {
+            return;
+        }
+
+        // Cancel the default shift-click behavior
+        event.setCancelled(true);
+
+        // Check permission to deposit
+        if (!canDeposit()) {
+            this.messageService.getMessage(cfg -> cfg.vaultNoPermissionDeposit)
+                    .receiver(this.player)
+                    .send();
+            return;
+        }
+
+        GuildVault vault = this.vaultManager.getVault(this.guild);
+        
+        // Check vault capacity
+        int maxItems = this.config.guildVault.maxItemPages * ITEMS_PER_PAGE;
+        if (vault.getItemCount() >= maxItems) {
+            this.messageService.getMessage(cfg -> cfg.vaultFull)
+                    .receiver(this.player)
+                    .send();
+            return;
+        }
+
+        // Clone the item before any changes
+        ItemStack itemToDeposit = clickedItem.clone();
+        
+        // Add item to vault
+        vault.addItem(itemToDeposit);
+        
+        // Remove item from player's inventory
+        event.setCurrentItem(null);
+        
+        // Mark guild as changed for persistence
+        this.guild.markChanged();
+        
+        // Log event
+        this.eventLogManager.logEvent(this.guild, EventLogType.VAULT_DEPOSIT_ITEM,
+                this.user, itemToDeposit.getType().name(), 
+                itemToDeposit.getAmount() + "x " + itemToDeposit.getType().name());
+
+        this.messageService.getMessage(cfg -> cfg.vaultDepositItem)
+                .receiver(this.player)
+                .send();
+
         // Schedule GUI refresh on next tick
         this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
             new VaultItemsGui(this.plugin, this.config, this.messageService, this.vaultManager,

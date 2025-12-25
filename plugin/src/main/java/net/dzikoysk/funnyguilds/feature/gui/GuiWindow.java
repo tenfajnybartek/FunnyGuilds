@@ -32,6 +32,10 @@ public class GuiWindow {
         this.inv.setItem(slot, item);
     }
 
+    public void setShiftClickHandler(Consumer<InventoryClickEvent> handler) {
+        this.holder.setShiftClickHandler(handler);
+    }
+
     public void setToNextFree(ItemStack item) {
         this.setToNextFree(item, 0);
     }

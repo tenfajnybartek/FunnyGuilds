@@ -12,6 +12,7 @@ public class FunnyHolder implements InventoryHolder {
 
     private final GuiWindow guiWindow;
     private final Map<Integer, Consumer<InventoryClickEvent>> actions;
+    private Consumer<InventoryClickEvent> shiftClickHandler;
     private Inventory inventory;
 
     public FunnyHolder(GuiWindow guiWindow) {
@@ -21,6 +22,12 @@ public class FunnyHolder implements InventoryHolder {
 
     public void handleClick(InventoryClickEvent event) {
         this.actions.getOrDefault(event.getRawSlot(), e -> e.setCancelled(true)).accept(event);
+    }
+
+    public void handleShiftClick(InventoryClickEvent event) {
+        if (this.shiftClickHandler != null) {
+            this.shiftClickHandler.accept(event);
+        }
     }
 
     @Override
@@ -34,6 +41,10 @@ public class FunnyHolder implements InventoryHolder {
 
     public void setActionOnSlot(Integer slot, Consumer<InventoryClickEvent> consumer) {
         this.actions.put(slot, consumer != null ? consumer : event -> {});
+    }
+
+    public void setShiftClickHandler(Consumer<InventoryClickEvent> handler) {
+        this.shiftClickHandler = handler;
     }
 
     public void setInventory(Inventory inventory) {
