@@ -165,6 +165,9 @@ public class VaultMoneyGui {
         // Withdraw from player and deposit to vault
         VaultHook.withdrawFromPlayerBank(this.player, amount);
         vault.deposit(amount);
+        
+        // Mark guild as changed for persistence
+        this.guild.markChanged();
 
         // Log event
         this.eventLogManager.logEvent(this.guild, EventLogType.VAULT_DEPOSIT_MONEY,
@@ -207,6 +210,9 @@ public class VaultMoneyGui {
         // Withdraw from vault and deposit to player
         vault.withdraw(amount);
         VaultHook.depositToPlayerBank(this.player, amount);
+        
+        // Mark guild as changed for persistence
+        this.guild.markChanged();
 
         // Log event
         this.eventLogManager.logEvent(this.guild, EventLogType.VAULT_WITHDRAW_MONEY,

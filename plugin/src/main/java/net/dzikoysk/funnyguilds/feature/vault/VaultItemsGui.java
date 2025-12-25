@@ -101,6 +101,9 @@ public class VaultItemsGui {
                 // Remove from vault
                 vault.removeItem(itemIndex);
                 
+                // Mark guild as changed for persistence
+                this.guild.markChanged();
+                
                 // Log event
                 this.eventLogManager.logEvent(this.guild, EventLogType.VAULT_WITHDRAW_ITEM,
                         this.user, item.getType().name(), 
@@ -191,6 +194,9 @@ public class VaultItemsGui {
 
         // Add item to vault
         vault.addItem(cursorItem.clone());
+        
+        // Mark guild as changed for persistence
+        this.guild.markChanged();
         
         // Remove item from cursor
         this.player.setItemOnCursor(null);
