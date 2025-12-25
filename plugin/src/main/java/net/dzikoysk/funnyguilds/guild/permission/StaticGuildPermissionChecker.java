@@ -25,7 +25,10 @@ final class StaticGuildPermissionChecker implements GuildPermissionChecker {
 
     private static final Collection<? extends GuildPermission<?>> MEMBER_PERMISSIONS = EnumSet.of(
             GuildCommandPermission.BASE,
-            GuildCommandPermission.LEAVE
+            GuildCommandPermission.LEAVE,
+            GuildCommandPermission.VAULT,
+            GuildCommandPermission.EVENTLOG,
+            GuildCommandPermission.DIPLOMACY
     );
     private static final Collection<? extends GuildPermission<?>> MANAGER_PERMISSIONS = EnumSet.of(
             GuildCommandPermission.SET_BASE,
