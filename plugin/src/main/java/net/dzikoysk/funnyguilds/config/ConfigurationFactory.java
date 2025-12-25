@@ -7,7 +7,6 @@ import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import java.io.File;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
 import net.dzikoysk.funnyguilds.config.file.CommandsConfig;
@@ -143,20 +142,6 @@ public final class ConfigurationFactory {
      * @return The loaded configuration object
      */
     private static <T extends OkaeriConfig> T createConfig(Class<T> configClass, File configFile, Logger logger) {
-        return createConfig(configClass, configFile, logger, null);
-    }
-
-    /**
-     * Creates a configuration object of the specified type with optional additional setup.
-     *
-     * @param configClass The class of the configuration
-     * @param configFile The file to load/save the configuration
-     * @param logger The logger for configuration loading
-     * @param additionalSetup Optional additional setup for the configuration
-     * @param <T> The type of configuration
-     * @return The loaded configuration object
-     */
-    private static <T extends OkaeriConfig> T createConfig(Class<T> configClass, File configFile, Logger logger, Consumer<eu.okaeri.configs.OkaeriConfigInitializer<T>> additionalSetup) {
         return ConfigManager.create(configClass, (it) -> {
             it.withConfigurer(new OkaeriValidator(new YamlBukkitConfigurer(), true), new SerdesCommons());
             it.withSerdesPack(registry -> {
@@ -176,10 +161,6 @@ public final class ConfigurationFactory {
             it.withLogger(logger);
             it.saveDefaults();
             it.load(true);
-
-            if (additionalSetup != null) {
-                additionalSetup.accept(it);
-            }
         });
     }
 
