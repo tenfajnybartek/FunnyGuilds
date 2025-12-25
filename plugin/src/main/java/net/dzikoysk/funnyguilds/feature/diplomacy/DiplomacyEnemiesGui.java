@@ -56,11 +56,24 @@ public class DiplomacyEnemiesGui {
 
         GuiWindow gui = new GuiWindow(title, ROWS);
 
-        // Display enemies
-        Set<Guild> enemies = this.guild.getEnemies();
+        // Get enemies in both directions:
+        // 1. Guilds we declared war on
+        // 2. Guilds that declared war on us
+        Set<Guild> allEnemies = new java.util.HashSet<>(this.guild.getEnemies());
+        
+        // Find guilds that have us as enemy
+        for (Guild otherGuild : this.plugin.getGuildManager().getGuilds()) {
+            if (otherGuild.isEnemy(this.guild)) {
+                allEnemies.add(otherGuild);
+            }
+        }
+        
         int slot = 0;
-        for (Guild enemy : enemies) {
+        for (Guild enemy : allEnemies) {
             if (slot >= 45) break; // Leave space for navigation
+            
+            boolean weAttacked = this.guild.isEnemy(enemy);
+            boolean theyAttacked = enemy.isEnemy(this.guild);
 
             FunnyFormatter formatter = new FunnyFormatter()
                     .register("{ENEMY-TAG}", enemy.getTag())
@@ -72,6 +85,21 @@ public class DiplomacyEnemiesGui {
             for (var line : enemiesConfig.enemyItemLore) {
                 lore.add(formatter.replace(line.getValue()));
             }
+            
+            // Add war direction info
+            if (weAttacked && theyAttacked) {
+                lore.add(ChatUtils.colored("&c&lObustronna wojna!"));
+            } else if (weAttacked) {
+                lore.add(ChatUtils.colored("&7Wypowiedziana przez: &enas"));
+            } else {
+                lore.add(ChatUtils.colored("&7Wypowiedziana przez: &c" + enemy.getTag()));
+            }
+            
+            // Only show "end war" option if we declared war on them
+            if (weAttacked) {
+                lore.add("");
+                lore.add(ChatUtils.colored("&eKliknij, aby zakończyć wojnę"));
+            }
 
             ItemStack item = new ItemBuilder(enemiesConfig.enemyMaterial)
                     .setName(formatter.replace(enemiesConfig.enemyItemName.getValue()), true)
@@ -79,8 +107,16 @@ public class DiplomacyEnemiesGui {
                     .getItem();
 
             Guild targetEnemy = enemy;
+            boolean canEndWar = weAttacked;
             gui.setItem(slot, item, event -> {
                 event.setCancelled(true);
+
+                if (!canEndWar) {
+                    this.messageService.getMessage(cfg -> cfg.diplomacyCannotEndWarNotDeclared)
+                            .receiver(this.player)
+                            .send();
+                    return;
+                }
 
                 // Check if user is leader or deputy
                 if (!this.guild.isOwner(this.user) && !this.guild.isDeputy(this.user)) {

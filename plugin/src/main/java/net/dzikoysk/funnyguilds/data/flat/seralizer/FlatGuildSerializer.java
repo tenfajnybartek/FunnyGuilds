@@ -3,6 +3,7 @@ package net.dzikoysk.funnyguilds.data.flat.seralizer;
 import java.io.File;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,8 @@ import net.dzikoysk.funnyguilds.config.PluginConfiguration;
 import net.dzikoysk.funnyguilds.data.flat.FlatDataModel;
 import net.dzikoysk.funnyguilds.data.util.DeserializationUtils;
 import net.dzikoysk.funnyguilds.data.util.YamlWrapper;
+import net.dzikoysk.funnyguilds.feature.vault.GuildVault;
+import net.dzikoysk.funnyguilds.feature.vault.GuildVaultManager;
 import net.dzikoysk.funnyguilds.guild.Guild;
 import net.dzikoysk.funnyguilds.guild.GuildManager;
 import net.dzikoysk.funnyguilds.guild.Region;
@@ -34,7 +37,13 @@ import net.dzikoysk.funnyguilds.user.User;
 import net.dzikoysk.funnyguilds.user.UserManager;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 import panda.std.Option;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public final class FlatGuildSerializer {
 
@@ -177,6 +186,9 @@ public final class FlatGuildSerializer {
         // Deserialize member permissions after guild is created
         guildOption.peek(g -> deserializeMemberPermissions(wrapper, g));
         
+        // Deserialize vault after guild is created
+        guildOption.peek(g -> deserializeVault(wrapper, g));
+        
         return guildOption;
     }
 
@@ -224,6 +236,9 @@ public final class FlatGuildSerializer {
         
         // Serialize member permissions
         serializeMemberPermissions(wrapper, guild);
+        
+        // Serialize vault
+        serializeVault(wrapper, guild);
 
         wrapper.save();
         guild.markUnchanged();
@@ -381,6 +396,97 @@ public final class FlatGuildSerializer {
         }
         
         permissionsManager.setMemberPermissions(allPermissions);
+    }
+    
+    private static void serializeVault(YamlWrapper wrapper, Guild guild) {
+        GuildVaultManager vaultManager = FunnyGuilds.getInstance().getGuildVaultManager();
+        if (vaultManager == null || !vaultManager.isEnabled()) {
+            return;
+        }
+        
+        GuildVault vault = vaultManager.getVaultOrNull(guild.getUUID());
+        if (vault == null) {
+            wrapper.set("vault", null);
+            return;
+        }
+        
+        Map<String, Object> vaultData = new HashMap<>();
+        vaultData.put("balance", vault.getBalance());
+        
+        // Serialize items using Bukkit serialization
+        List<String> serializedItems = new ArrayList<>();
+        for (ItemStack item : vault.getItems()) {
+            if (item != null && !item.getType().isAir()) {
+                try {
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+                    dataOutput.writeObject(item);
+                    dataOutput.close();
+                    serializedItems.add(Base64.getEncoder().encodeToString(outputStream.toByteArray()));
+                } catch (IOException e) {
+                    FunnyGuilds.getPluginLogger().error("Failed to serialize vault item: " + e.getMessage());
+                }
+            }
+        }
+        vaultData.put("items", serializedItems);
+        
+        wrapper.set("vault", vaultData);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static void deserializeVault(YamlWrapper wrapper, Guild guild) {
+        GuildVaultManager vaultManager = FunnyGuilds.getInstance().getGuildVaultManager();
+        if (vaultManager == null || !vaultManager.isEnabled()) {
+            return;
+        }
+        
+        Object vaultObj = wrapper.get("vault");
+        if (vaultObj == null) {
+            return;
+        }
+        
+        Map<String, Object> vaultData;
+        if (vaultObj instanceof ConfigurationSection) {
+            ConfigurationSection section = (ConfigurationSection) vaultObj;
+            vaultData = new HashMap<>();
+            for (String key : section.getKeys(false)) {
+                vaultData.put(key, section.get(key));
+            }
+        } else if (vaultObj instanceof Map) {
+            vaultData = (Map<String, Object>) vaultObj;
+        } else {
+            return;
+        }
+        
+        double balance = 0.0;
+        Object balanceObj = vaultData.get("balance");
+        if (balanceObj instanceof Number) {
+            balance = ((Number) balanceObj).doubleValue();
+        }
+        
+        List<ItemStack> items = new ArrayList<>();
+        Object itemsObj = vaultData.get("items");
+        if (itemsObj instanceof List) {
+            List<String> serializedItems = (List<String>) itemsObj;
+            for (String serialized : serializedItems) {
+                try {
+                    byte[] data = Base64.getDecoder().decode(serialized);
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+                    BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+                    ItemStack item = (ItemStack) dataInput.readObject();
+                    dataInput.close();
+                    if (item != null) {
+                        items.add(item);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    FunnyGuilds.getPluginLogger().error("Failed to deserialize vault item: " + e.getMessage());
+                }
+            }
+        }
+        
+        GuildVault vault = new GuildVault(guild.getUUID(), balance, items);
+        vault.markClean();
+        vaultManager.loadVault(vault);
     }
 
 }

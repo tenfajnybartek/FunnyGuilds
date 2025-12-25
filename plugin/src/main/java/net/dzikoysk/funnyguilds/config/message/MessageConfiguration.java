@@ -702,6 +702,7 @@ public class MessageConfiguration extends OkaeriConfig implements MessageReposit
     public SendableMessage diplomacyAllyBroken = ChatHolder.message("&cRozwiązano sojusz z gildią &7{TAG}&c!");
     @Comment("Dostępne zmienne: {TAG}")
     public SendableMessage diplomacyWarEnded = ChatHolder.message("&aZakończono wojnę z gildią &7{TAG}&a!");
+    public SendableMessage diplomacyCannotEndWarNotDeclared = ChatHolder.message("&cNie możesz zakończyć wojny, której nie wypowiedziałeś! Ta gildia wypowiedziała wojnę tobie.");
     @Comment("Dostępne zmienne: {TAG}")
     public SendableMessage diplomacyInvitationAccepted = ChatHolder.message("&aPrzyjęto zaproszenie do sojuszu od gildii &7{TAG}&a!");
     @Comment("Dostępne zmienne: {TAG}")
