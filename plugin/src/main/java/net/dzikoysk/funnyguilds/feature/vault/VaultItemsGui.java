@@ -56,14 +56,14 @@ public class VaultItemsGui {
         GuildVaultConfiguration.ItemsVaultConfig itemsConfig = vaultConfig.itemsVault;
         GuildVault vault = this.vaultManager.getVault(this.guild);
 
-        int maxPages = Math.max(1, (int) Math.ceil((double) vault.getItemCount() / ITEMS_PER_PAGE));
-        int currentPage = Math.min(this.page, maxPages - 1);
+        int configMaxPages = vaultConfig.maxItemPages;
+        int currentPage = Math.min(this.page, configMaxPages - 1);
 
         String title = new FunnyFormatter()
                 .register("{TAG}", this.guild.getTag())
                 .register("{GUILD}", this.guild.getName())
                 .register("{PAGE}", currentPage + 1)
-                .register("{MAX-PAGES}", maxPages)
+                .register("{MAX-PAGES}", configMaxPages)
                 .replace(itemsConfig.title.getValue());
         title = ChatUtils.colored(title);
 
@@ -153,8 +153,8 @@ public class VaultItemsGui {
             });
         }
 
-        // Next page button
-        if (currentPage < maxPages - 1) {
+        // Next page button - show if there are more pages available (even if empty)
+        if (currentPage < configMaxPages - 1) {
             ItemStack nextItem = new ItemBuilder(itemsConfig.nextPageMaterial)
                     .setName(itemsConfig.nextPageName.getValue(), true)
                     .getItem();
