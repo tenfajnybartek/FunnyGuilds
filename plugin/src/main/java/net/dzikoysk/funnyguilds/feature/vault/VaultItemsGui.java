@@ -192,27 +192,30 @@ public class VaultItemsGui {
             return;
         }
 
+        // Clone the item before any changes
+        ItemStack itemToDeposit = cursorItem.clone();
+        
         // Add item to vault
-        vault.addItem(cursorItem.clone());
+        vault.addItem(itemToDeposit);
         
         // Mark guild as changed for persistence
         this.guild.markChanged();
         
-        // Remove item from cursor
-        this.player.setItemOnCursor(null);
-        
         // Log event
         this.eventLogManager.logEvent(this.guild, EventLogType.VAULT_DEPOSIT_ITEM,
-                this.user, cursorItem.getType().name(), 
-                cursorItem.getAmount() + "x " + cursorItem.getType().name());
+                this.user, itemToDeposit.getType().name(), 
+                itemToDeposit.getAmount() + "x " + itemToDeposit.getType().name());
 
         this.messageService.getMessage(cfg -> cfg.vaultDepositItem)
                 .receiver(this.player)
                 .send();
 
-        // Refresh GUI
-        new VaultItemsGui(this.plugin, this.config, this.messageService, this.vaultManager,
-                this.eventLogManager, this.guild, this.user, this.player, currentPage).open();
+        // Schedule cursor and GUI update on next tick to ensure event processing is complete
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
+            this.player.setItemOnCursor(null);
+            new VaultItemsGui(this.plugin, this.config, this.messageService, this.vaultManager,
+                    this.eventLogManager, this.guild, this.user, this.player, currentPage).open();
+        });
     }
 
     private boolean canDeposit() {
