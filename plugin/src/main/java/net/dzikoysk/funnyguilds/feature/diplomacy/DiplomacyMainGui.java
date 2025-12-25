@@ -55,7 +55,9 @@ public class DiplomacyMainGui {
                 .replace(diplomacyConfig.title.getValue());
         title = ChatUtils.colored(title);
 
-        GuiWindow gui = new GuiWindow(title, diplomacyConfig.rows);
+        // Ensure rows is at least 6 for backSlot compatibility
+        int rows = Math.max(diplomacyConfig.rows, 6);
+        GuiWindow gui = new GuiWindow(title, rows);
 
         // Fill empty slots
         if (this.config.guildPanel.fillItem.enabled) {
