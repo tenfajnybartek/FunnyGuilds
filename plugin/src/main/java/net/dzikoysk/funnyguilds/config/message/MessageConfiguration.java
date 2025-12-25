@@ -668,6 +668,46 @@ public class MessageConfiguration extends OkaeriConfig implements MessageReposit
     public SendableMessage permissionsPanelCannotManageSelf = ChatHolder.message("&cNie możesz zarządzać własnymi uprawnieniami!");
 
     @Comment("")
+    @Comment("<------- Guild Vault Messages -------> #")
+    public SendableMessage vaultDisabled = ChatHolder.message("&cSkarbiec gildii jest wyłączony!");
+    public SendableMessage vaultNoPermissionDeposit = ChatHolder.message("&cNie masz uprawnień do wpłacania do skarbca!");
+    public SendableMessage vaultNoPermissionWithdraw = ChatHolder.message("&cNie masz uprawnień do wypłacania ze skarbca!");
+    @Comment("Dostępne zmienne: {AMOUNT}")
+    public SendableMessage vaultDepositMoney = ChatHolder.message("&aWpłacono &e{AMOUNT}$ &ado skarbca gildii!");
+    @Comment("Dostępne zmienne: {AMOUNT}")
+    public SendableMessage vaultWithdrawMoney = ChatHolder.message("&aWypłacono &e{AMOUNT}$ &aze skarbca gildii!");
+    public SendableMessage vaultNotEnoughMoney = ChatHolder.message("&cNie masz wystarczającej ilości pieniędzy!");
+    public SendableMessage vaultNotEnoughInVault = ChatHolder.message("&cW skarbcu gildii nie ma wystarczającej ilości pieniędzy!");
+    @Comment("Dostępne zmienne: {ITEM}")
+    public SendableMessage vaultDepositItem = ChatHolder.message("&aWpłacono przedmiot do skarbca gildii!");
+    @Comment("Dostępne zmienne: {ITEM}")
+    public SendableMessage vaultWithdrawItem = ChatHolder.message("&aWypłacono przedmiot ze skarbca gildii!");
+    public SendableMessage vaultFull = ChatHolder.message("&cSkarbiec gildii jest pełny!");
+    public SendableMessage vaultInventoryFull = ChatHolder.message("&cTwój ekwipunek jest pełny!");
+
+    @Comment("")
+    @Comment("<------- Event Log Messages -------> #")
+    public SendableMessage eventLogDisabled = ChatHolder.message("&cDziennik zdarzeń gildii jest wyłączony!");
+    public SendableMessage eventLogEmpty = ChatHolder.message("&cBrak wpisów w dzienniku zdarzeń gildii!");
+
+    @Comment("")
+    @Comment("<------- Diplomacy Messages -------> #")
+    public SendableMessage diplomacyDisabled = ChatHolder.message("&cPanel dyplomacji jest wyłączony!");
+    public SendableMessage diplomacyNotLeaderOrDeputy = ChatHolder.message("&cTylko lider lub zastępca może zarządzać dyplomacją!");
+    @Comment("Dostępne zmienne: {TAG}")
+    public SendableMessage diplomacyAllyPvpEnabled = ChatHolder.message("&cWłączono PvP z sojuszem &7{TAG}&c!");
+    @Comment("Dostępne zmienne: {TAG}")
+    public SendableMessage diplomacyAllyPvpDisabled = ChatHolder.message("&aWyłączono PvP z sojuszem &7{TAG}&a!");
+    @Comment("Dostępne zmienne: {TAG}")
+    public SendableMessage diplomacyAllyBroken = ChatHolder.message("&cRozwiązano sojusz z gildią &7{TAG}&c!");
+    @Comment("Dostępne zmienne: {TAG}")
+    public SendableMessage diplomacyWarEnded = ChatHolder.message("&aZakończono wojnę z gildią &7{TAG}&a!");
+    @Comment("Dostępne zmienne: {TAG}")
+    public SendableMessage diplomacyInvitationAccepted = ChatHolder.message("&aPrzyjęto zaproszenie do sojuszu od gildii &7{TAG}&a!");
+    @Comment("Dostępne zmienne: {TAG}")
+    public SendableMessage diplomacyInvitationRejected = ChatHolder.message("&cOdrzucono zaproszenie do sojuszu od gildii &7{TAG}&c!");
+
+    @Comment("")
     @Comment("<------- Admin Messages -------> #")
     @Comment("Dostępne zmienne: {ADMIN}")
     public SendableMessage adminGuildBroken = ChatHolder.message("&cTwoja gildia zostala rozwiazana przez &7{ADMIN}");

@@ -17,7 +17,10 @@ public enum GuildCommandPermission implements GuildPermission<Boolean> {
     WAR("command.war"),
     PVP("command.pvp"),
     DELETE("command.delete"),
-    PANEL("command.panel");
+    PANEL("command.panel"),
+    VAULT("command.vault"),
+    EVENTLOG("command.eventlog"),
+    DIPLOMACY("command.diplomacy");
     
     private final Key key;
     

@@ -128,6 +128,8 @@ public class FunnyGuilds extends JavaPlugin {
     private FunnyServer funnyServer;
     private GuildPermissionChecker guildPermissionChecker;
     private net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager regionRegenerationManager;
+    private net.dzikoysk.funnyguilds.feature.vault.GuildVaultManager guildVaultManager;
+    private net.dzikoysk.funnyguilds.feature.eventlog.EventLogManager eventLogManager;
 
     private Option<IndividualNameTagManager> individualNameTagManager = Option.none();
     private Option<DummyManager> dummyManager = Option.none();
@@ -264,6 +266,8 @@ public class FunnyGuilds extends JavaPlugin {
         this.guildPermissionChecker = GuildPermissionChecker.create(this);
         this.regionRegenerationManager = new net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager();
         this.regionRegenerationManager.initialize(this);
+        this.guildVaultManager = new net.dzikoysk.funnyguilds.feature.vault.GuildVaultManager(this.pluginConfiguration);
+        this.eventLogManager = new net.dzikoysk.funnyguilds.feature.eventlog.EventLogManager(this.pluginConfiguration);
 
         this.prepareScoreboardServices();
 
@@ -354,6 +358,8 @@ public class FunnyGuilds extends JavaPlugin {
             resources.on(GuildEntityHelper.class).assignInstance(this.guildEntityHelper);
             resources.on(DataModel.class).assignInstance(this.dataModel);
             resources.on(net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager.class).assignInstance(this.regionRegenerationManager);
+            resources.on(net.dzikoysk.funnyguilds.feature.vault.GuildVaultManager.class).assignInstance(this.guildVaultManager);
+            resources.on(net.dzikoysk.funnyguilds.feature.eventlog.EventLogManager.class).assignInstance(this.eventLogManager);
         });
 
         MetricsCollector collector = new MetricsCollector(this);
@@ -674,6 +680,14 @@ public class FunnyGuilds extends JavaPlugin {
 
     public net.dzikoysk.funnyguilds.feature.regen.RegionRegenerationManager getRegionRegenerationManager() {
         return this.regionRegenerationManager;
+    }
+
+    public net.dzikoysk.funnyguilds.feature.vault.GuildVaultManager getGuildVaultManager() {
+        return this.guildVaultManager;
+    }
+
+    public net.dzikoysk.funnyguilds.feature.eventlog.EventLogManager getEventLogManager() {
+        return this.eventLogManager;
     }
 
     public Option<IndividualNameTagManager> getIndividualNameTagManager() {

@@ -111,7 +111,82 @@ public class PanelCommand extends AbstractFunnyCommand {
             addRegenerationMenuItem(gui, player, user, guild, panelConfig);
         }
 
+        // Item skarbca gildii
+        if (this.config.guildVault.enabled) {
+            addVaultMenuItem(gui, player, user, guild);
+        }
+
+        // Item dziennika zdarzeń
+        if (this.config.eventLog.enabled) {
+            addEventLogMenuItem(gui, player, user, guild);
+        }
+
+        // Item dyplomacji
+        if (this.config.diplomacy.enabled && this.config.diplomacy.panelIcon.enabled) {
+            addDiplomacyMenuItem(gui, player, user, guild);
+        }
+
         gui.open(player);
+    }
+
+    private void addVaultMenuItem(GuiWindow gui, Player player, User user, Guild guild) {
+        var vaultConfig = this.config.guildVault;
+        var vault = this.plugin.getGuildVaultManager().getVault(guild);
+
+        FunnyFormatter formatter = new FunnyFormatter()
+                .register("{ITEM-COUNT}", vault.getItemCount())
+                .register("{BALANCE}", String.format("%.2f", vault.getBalance()));
+
+        List<String> lore = new ArrayList<>();
+        for (var line : vaultConfig.itemsMenuItem.lore) {
+            lore.add(formatter.replace(line.getValue()));
+        }
+
+        ItemStack item = new ItemBuilder(Material.CHEST)
+                .setName("&6&lSKARBIEC GILDII", true)
+                .setLore(List.of("&7Zarządzaj skarbcem gildii!", "", "&7Przedmiotów: &e" + vault.getItemCount(), "&7Pieniądze: &6" + String.format("%.2f$", vault.getBalance()), "", "&aKliknij, aby otworzyć!"), true)
+                .getItem();
+
+        gui.setItem(30, item, event -> {
+            event.setCancelled(true);
+            player.closeInventory();
+            player.performCommand(this.config.commands.vault.name);
+        });
+    }
+
+    private void addEventLogMenuItem(GuiWindow gui, Player player, User user, Guild guild) {
+        int logCount = this.plugin.getEventLogManager().getLogCount(guild);
+
+        ItemStack item = new ItemBuilder(Material.BOOK)
+                .setName("&d&lDZIENNIK GILDII", true)
+                .setLore(List.of("&7Przeglądaj historię zdarzeń!", "", "&7Wpisów: &d" + logCount, "", "&aKliknij, aby otworzyć!"), true)
+                .getItem();
+
+        gui.setItem(32, item, event -> {
+            event.setCancelled(true);
+            player.closeInventory();
+            player.performCommand(this.config.commands.eventlog.name);
+        });
+    }
+
+    private void addDiplomacyMenuItem(GuiWindow gui, Player player, User user, Guild guild) {
+        var diplomacyConfig = this.config.diplomacy.panelIcon;
+
+        List<String> lore = new ArrayList<>();
+        for (var line : diplomacyConfig.lore) {
+            lore.add(line.getValue());
+        }
+
+        ItemStack item = new ItemBuilder(diplomacyConfig.material)
+                .setName(diplomacyConfig.name.getValue(), true)
+                .setLore(lore, true)
+                .getItem();
+
+        gui.setItem(diplomacyConfig.slot, item, event -> {
+            event.setCancelled(true);
+            player.closeInventory();
+            player.performCommand(this.config.commands.diplomacy.name);
+        });
     }
 
     private void addRegenerationMenuItem(GuiWindow gui, Player player, User user, Guild guild, PanelConfiguration panelConfig) {

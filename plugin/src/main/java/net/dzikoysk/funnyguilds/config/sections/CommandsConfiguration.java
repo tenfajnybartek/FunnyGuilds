@@ -72,6 +72,12 @@ public class CommandsConfiguration extends OkaeriConfig {
     public FunnyCommand panel = new FunnyCommand("panel", Collections.singletonList("zarzadzaj"));
     @Comment("")
     public FunnyCommand permissions = new FunnyCommand("uprawnienia", Arrays.asList("perms", "permissions"));
+    @Comment("")
+    public FunnyCommand vault = new FunnyCommand("skarbiec", Arrays.asList("vault", "bank"));
+    @Comment("")
+    public FunnyCommand eventlog = new FunnyCommand("eventlog", Arrays.asList("dziennik", "log", "logi"));
+    @Comment("")
+    public FunnyCommand diplomacy = new FunnyCommand("dyplomacja", Arrays.asList("diplomacy", "sojusze"));
 
     @Comment
     @Comment("Komendy administratora")

@@ -34,6 +34,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
 import net.dzikoysk.funnyguilds.config.sections.CommandsConfiguration;
+import net.dzikoysk.funnyguilds.config.sections.DiplomacyConfiguration;
+import net.dzikoysk.funnyguilds.config.sections.EventLogConfiguration;
+import net.dzikoysk.funnyguilds.config.sections.GuildVaultConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.HeartConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.MysqlConfiguration;
 import net.dzikoysk.funnyguilds.config.sections.PanelConfiguration;
@@ -338,6 +341,21 @@ public class PluginConfiguration extends OkaeriConfig {
     @Comment("Konfiguracja panelu uprawnień członków gildii")
     @CustomKey("permissions-panel")
     public PermissionsPanelConfiguration permissionsPanel = new PermissionsPanelConfiguration();
+
+    @Comment("")
+    @Comment("Konfiguracja skarbca gildii")
+    @CustomKey("guild-vault")
+    public GuildVaultConfiguration guildVault = new GuildVaultConfiguration();
+
+    @Comment("")
+    @Comment("Konfiguracja dziennika zdarzeń gildii")
+    @CustomKey("event-log")
+    public EventLogConfiguration eventLog = new EventLogConfiguration();
+
+    @Comment("")
+    @Comment("Konfiguracja panelu dyplomacji gildii")
+    @CustomKey("diplomacy")
+    public DiplomacyConfiguration diplomacy = new DiplomacyConfiguration();
 
     @Comment("")
     @Comment("Minimalna odległość od spawnu")
