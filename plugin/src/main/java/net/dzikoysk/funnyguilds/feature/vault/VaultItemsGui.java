@@ -16,6 +16,7 @@ import net.dzikoysk.funnyguilds.shared.formatter.FunnyFormatter;
 import net.dzikoysk.funnyguilds.user.User;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -121,10 +122,16 @@ public class VaultItemsGui {
 
         // Add click handlers for empty slots (for depositing items)
         for (int slot = endIndex - startIndex; slot < ITEMS_PER_PAGE; slot++) {
-            final int emptySlot = slot;
             gui.setItem(slot, null, event -> {
                 event.setCancelled(true);
-                handleDeposit(event.getCursor(), currentPage);
+                // Try multiple sources for the cursor item (Paper/Spigot compatibility)
+                ItemStack cursor = event.getCursor();
+                if (cursor == null || cursor.getType().isAir()) {
+                    cursor = event.getView().getCursor();
+                }
+                if (cursor != null && !cursor.getType().isAir()) {
+                    handleDeposit(cursor, currentPage, event);
+                }
             });
         }
 
@@ -168,7 +175,7 @@ public class VaultItemsGui {
         gui.open(this.player);
     }
 
-    private void handleDeposit(ItemStack cursorItem, int currentPage) {
+    private void handleDeposit(ItemStack cursorItem, int currentPage, InventoryClickEvent event) {
         if (cursorItem == null || cursorItem.getType() == Material.AIR) {
             return;
         }
@@ -210,9 +217,11 @@ public class VaultItemsGui {
                 .receiver(this.player)
                 .send();
 
-        // Schedule cursor and GUI update on next tick to ensure event processing is complete
+        // Clear cursor directly through event to avoid sync issues
+        event.getView().setCursor(null);
+        
+        // Schedule GUI refresh on next tick
         this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
-            this.player.setItemOnCursor(null);
             new VaultItemsGui(this.plugin, this.config, this.messageService, this.vaultManager,
                     this.eventLogManager, this.guild, this.user, this.player, currentPage).open();
         });
