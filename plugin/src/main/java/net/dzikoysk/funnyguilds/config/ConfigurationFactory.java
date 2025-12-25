@@ -2,11 +2,24 @@ package net.dzikoysk.funnyguilds.config;
 
 import dev.peri.yetanothermessageslibrary.config.serdes.SerdesMessages;
 import eu.okaeri.configs.ConfigManager;
+import eu.okaeri.configs.OkaeriConfig;
 import eu.okaeri.configs.serdes.commons.SerdesCommons;
 import eu.okaeri.configs.validator.okaeri.OkaeriValidator;
 import eu.okaeri.configs.yaml.bukkit.YamlBukkitConfigurer;
 import java.io.File;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
+import net.dzikoysk.funnyguilds.config.file.CommandsConfig;
+import net.dzikoysk.funnyguilds.config.file.CoreConfig;
+import net.dzikoysk.funnyguilds.config.file.DatabaseConfig;
+import net.dzikoysk.funnyguilds.config.file.DiplomacyConfig;
+import net.dzikoysk.funnyguilds.config.file.DisplayConfig;
+import net.dzikoysk.funnyguilds.config.file.EventsConfig;
+import net.dzikoysk.funnyguilds.config.file.GameplayConfig;
+import net.dzikoysk.funnyguilds.config.file.PanelConfig;
+import net.dzikoysk.funnyguilds.config.file.RankSystemConfig;
+import net.dzikoysk.funnyguilds.config.file.SecurityConfig;
 import net.dzikoysk.funnyguilds.config.message.MessageConfiguration;
 import net.dzikoysk.funnyguilds.config.serdes.ColorSerializer;
 import net.dzikoysk.funnyguilds.config.serdes.DecolorTransformer;
@@ -78,6 +91,95 @@ public final class ConfigurationFactory {
             it.withBindFile(tablistConfigurationFile);
             it.saveDefaults();
             it.load(true);
+        });
+    }
+
+    /**
+     * Creates a PluginConfigurationContainer with all separate configuration files loaded from the config directory.
+     *
+     * @param configDir The directory containing all configuration files (plugins/FunnyGuilds/config/)
+     * @param logger The logger for configuration loading
+     * @return A container with all configuration objects
+     */
+    public static PluginConfigurationContainer createConfigurationContainer(File configDir, Logger logger) {
+        // Ensure config directory exists
+        if (!configDir.exists()) {
+            configDir.mkdirs();
+        }
+
+        // Create individual configuration files
+        CoreConfig core = createConfig(CoreConfig.class, new File(configDir, "config.yml"), logger);
+        DatabaseConfig database = createConfig(DatabaseConfig.class, new File(configDir, "database.yml"), logger);
+        PanelConfig panel = createConfig(PanelConfig.class, new File(configDir, "panel.yml"), logger);
+        GameplayConfig gameplay = createConfig(GameplayConfig.class, new File(configDir, "gameplay.yml"), logger);
+        DiplomacyConfig diplomacy = createConfig(DiplomacyConfig.class, new File(configDir, "diplomacy.yml"), logger);
+        SecurityConfig security = createConfig(SecurityConfig.class, new File(configDir, "security.yml"), logger);
+        DisplayConfig display = createConfig(DisplayConfig.class, new File(configDir, "display.yml"), logger);
+        CommandsConfig commands = createConfig(CommandsConfig.class, new File(configDir, "commands.yml"), logger);
+        EventsConfig events = createConfig(EventsConfig.class, new File(configDir, "events.yml"), logger);
+        RankSystemConfig rankSystem = createConfig(RankSystemConfig.class, new File(configDir, "rank-system.yml"), logger);
+
+        return new PluginConfigurationContainer(
+                core,
+                database,
+                panel,
+                gameplay,
+                diplomacy,
+                security,
+                display,
+                commands,
+                events,
+                rankSystem
+        );
+    }
+
+    /**
+     * Creates a configuration object of the specified type.
+     *
+     * @param configClass The class of the configuration
+     * @param configFile The file to load/save the configuration
+     * @param logger The logger for configuration loading
+     * @param <T> The type of configuration
+     * @return The loaded configuration object
+     */
+    private static <T extends OkaeriConfig> T createConfig(Class<T> configClass, File configFile, Logger logger) {
+        return createConfig(configClass, configFile, logger, null);
+    }
+
+    /**
+     * Creates a configuration object of the specified type with optional additional setup.
+     *
+     * @param configClass The class of the configuration
+     * @param configFile The file to load/save the configuration
+     * @param logger The logger for configuration loading
+     * @param additionalSetup Optional additional setup for the configuration
+     * @param <T> The type of configuration
+     * @return The loaded configuration object
+     */
+    private static <T extends OkaeriConfig> T createConfig(Class<T> configClass, File configFile, Logger logger, Consumer<eu.okaeri.configs.OkaeriConfigInitializer<T>> additionalSetup) {
+        return ConfigManager.create(configClass, (it) -> {
+            it.withConfigurer(new OkaeriValidator(new YamlBukkitConfigurer(), true), new SerdesCommons());
+            it.withSerdesPack(registry -> {
+                registry.register(new RawStringTransformer());
+                registry.register(new ColorSerializer());
+                registry.register(new MaterialTransformer());
+                registry.register(new ItemStackTransformer());
+                registry.register(new EntityTypeTransformer());
+                registry.register(new VectorSerializer());
+                registry.register(new FunnyTimeTransformer());
+                registry.register(new FunnyPatternTransformer());
+                registry.register(new RangeFormattingTransformer());
+                registry.register(new NumberRangeTransformer());
+            });
+
+            it.withBindFile(configFile);
+            it.withLogger(logger);
+            it.saveDefaults();
+            it.load(true);
+
+            if (additionalSetup != null) {
+                additionalSetup.accept(it);
+            }
         });
     }
 
