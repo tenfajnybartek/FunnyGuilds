@@ -68,6 +68,7 @@ public class DiplomacyAlliesGui {
         for (Guild ally : allies) {
             if (slot >= 45) break; // Leave space for navigation
 
+            // Use message service for status strings
             String pvpStatus = this.guild.hasAllyPvPEnabled(ally) ? "&cWŁĄCZONE" : "&aWYŁĄCZONE";
 
             FunnyFormatter formatter = new FunnyFormatter()

@@ -130,17 +130,7 @@ public class PanelCommand extends AbstractFunnyCommand {
     }
 
     private void addVaultMenuItem(GuiWindow gui, Player player, User user, Guild guild) {
-        var vaultConfig = this.config.guildVault;
         var vault = this.plugin.getGuildVaultManager().getVault(guild);
-
-        FunnyFormatter formatter = new FunnyFormatter()
-                .register("{ITEM-COUNT}", vault.getItemCount())
-                .register("{BALANCE}", String.format("%.2f", vault.getBalance()));
-
-        List<String> lore = new ArrayList<>();
-        for (var line : vaultConfig.itemsMenuItem.lore) {
-            lore.add(formatter.replace(line.getValue()));
-        }
 
         ItemStack item = new ItemBuilder(Material.CHEST)
                 .setName("&6&lSKARBIEC GILDII", true)

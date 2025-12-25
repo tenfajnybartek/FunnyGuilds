@@ -1,7 +1,5 @@
 package net.dzikoysk.funnyguilds.feature.vault;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
@@ -91,7 +89,7 @@ public class VaultItemsGui {
                 }
 
                 // Try to give item to player
-                HashMap<Integer, ItemStack> notAdded = this.player.getInventory().addItem(item.clone());
+                Map<Integer, ItemStack> notAdded = this.player.getInventory().addItem(item.clone());
                 if (!notAdded.isEmpty()) {
                     this.messageService.getMessage(cfg -> cfg.vaultInventoryFull)
                             .receiver(this.player)
