@@ -1,13 +1,16 @@
 package net.dzikoysk.funnyguilds.user
 
 import net.dzikoysk.funnyguilds.FunnyGuildsSpec
+import net.dzikoysk.funnyguilds.damage.DamageManager
 import net.dzikoysk.funnyguilds.data.MutableEntity
 import net.dzikoysk.funnyguilds.guild.Guild
 import nl.jqno.equalsverifier.EqualsVerifier
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.`when`
 import java.lang.ref.WeakReference
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class UserTest : FunnyGuildsSpec() {
@@ -44,5 +47,38 @@ class UserTest : FunnyGuildsSpec() {
         assertEquals("changed", result.get().name)
     }
 
+    @Test
+    fun `getDamageState should return damage state for user`() {
+        val uuid = UUID.randomUUID()
+        val user = userManager.create(uuid, "testUser", FakeUserProfile.offline())
+        
+        // Mock DamageManager
+        val damageManager = DamageManager()
+        `when`(funnyGuilds.damageManager).thenReturn(damageManager)
+        
+        // Get damage state through the new method
+        val damageState = user.damageState
+        
+        // Verify it returns a valid DamageState
+        assertNotNull(damageState)
+        assertEquals(0.0, damageState.totalDamage)
+    }
+
+    @Test
+    fun `getDamageState should return the same instance from DamageManager`() {
+        val uuid = UUID.randomUUID()
+        val user = userManager.create(uuid, "testUser", FakeUserProfile.offline())
+        
+        // Mock DamageManager
+        val damageManager = DamageManager()
+        `when`(funnyGuilds.damageManager).thenReturn(damageManager)
+        
+        // Get damage state multiple times
+        val damageState1 = user.damageState
+        val damageState2 = user.damageState
+        
+        // Should return the same instance (DamageManager caches by UUID)
+        assertTrue { damageState1 === damageState2 }
+    }
 
 }

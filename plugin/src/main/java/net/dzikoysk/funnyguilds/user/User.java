@@ -97,14 +97,6 @@ public class User extends AbstractMutableEntity {
     }
 
     /**
-     * @deprecated use {@link GuildPermissionChecker} to check specific permissions
-     */
-    @Deprecated
-    public boolean canManage() {
-        return this.isOwner() || this.isDeputy();
-    }
-
-    /**
      * Gets the damage state (damage history) for this user.
      * This is a convenience method that replaces the deprecated UserCache.getDamageHistory().
      *

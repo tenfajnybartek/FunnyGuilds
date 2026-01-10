@@ -6,6 +6,7 @@ import net.dzikoysk.funnyguilds.config.PluginConfiguration
 import net.dzikoysk.funnyguilds.config.message.MessageConfiguration
 import net.dzikoysk.funnyguilds.config.message.MessageService
 import net.dzikoysk.funnyguilds.config.tablist.TablistConfiguration
+import net.dzikoysk.funnyguilds.damage.DamageManager
 import net.dzikoysk.funnyguilds.guild.GuildManager
 import net.dzikoysk.funnyguilds.guild.GuildRankManager
 import net.dzikoysk.funnyguilds.guild.RegionManager
@@ -51,6 +52,7 @@ open class FunnyGuildsSpec : BukkitSpec() {
     protected lateinit var userRankManager: UserRankManager
     protected lateinit var guildRankManager: GuildRankManager
     private lateinit var regionManager: RegionManager
+    protected lateinit var damageManager: DamageManager
 
     protected lateinit var rankPlaceholdersService: RankPlaceholdersService
 
@@ -79,12 +81,14 @@ open class FunnyGuildsSpec : BukkitSpec() {
         guildRankManager = GuildRankManager(config)
         guildRankManager.register(DefaultTops.defaultGuildTops(guildManager))
         regionManager = RegionManager(config)
+        damageManager = DamageManager()
 
         lenient().`when`(funnyGuilds.userManager).thenReturn(userManager)
         lenient().`when`(funnyGuilds.guildManager).thenReturn(guildManager)
         lenient().`when`(funnyGuilds.userRankManager).thenReturn(userRankManager)
         lenient().`when`(funnyGuilds.guildRankManager).thenReturn(guildRankManager)
         lenient().`when`(funnyGuilds.regionManager).thenReturn(regionManager)
+        lenient().`when`(funnyGuilds.damageManager).thenReturn(damageManager)
 
         rankPlaceholdersService = RankPlaceholdersService(
             config,
