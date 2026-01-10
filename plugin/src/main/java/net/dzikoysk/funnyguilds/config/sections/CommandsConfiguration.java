@@ -55,7 +55,7 @@ public class CommandsConfiguration extends OkaeriConfig {
     @Comment("")
     public FunnyCommand player = new FunnyCommand("gracz");
     @Comment("")
-    public FunnyCommand top = new FunnyCommand("top", Collections.singletonList("top10"));
+    public FunnyCommand top = new FunnyCommand("topg", Collections.singletonList("top10"));
     @Comment("")
     public FunnyCommand validity = new FunnyCommand("przedluz");
     @Comment("")

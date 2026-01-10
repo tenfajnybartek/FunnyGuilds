@@ -25,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.panda_lang.utilities.inject.annotations.Inject;
@@ -40,7 +39,7 @@ public class PlayerChat extends AbstractFunnyListener {
     @Inject
     private GuildPermissionChecker permissionChecker;
 
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
