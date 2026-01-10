@@ -8,6 +8,8 @@ import net.dzikoysk.funnyguilds.shared.Position;
 import net.dzikoysk.funnyguilds.shared.bukkit.FunnyServer;
 import net.dzikoysk.funnyguilds.shared.bukkit.NmsUtils;
 import net.dzikoysk.funnyguilds.shared.bukkit.PositionConverter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
@@ -84,12 +86,18 @@ public class BukkitUserProfile implements UserProfile {
             return;
         }
 
-        this.getPlayer().peek(player -> player.sendMessage(message));
+        this.getPlayer().peek(player -> {
+            Component component = LegacyComponentSerializer.legacySection().deserialize(message);
+            player.sendMessage(component);
+        });
     }
 
     @Override
     public void kick(String reason) {
-        this.getPlayer().peek(player -> player.kickPlayer(reason));
+        this.getPlayer().peek(player -> {
+            Component component = LegacyComponentSerializer.legacySection().deserialize(reason);
+            player.kick(component);
+        });
     }
 
     @Override
