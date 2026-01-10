@@ -415,7 +415,7 @@ public class Guild extends AbstractMutableEntity {
 
     @Override
     public int hashCode() {
-        return this.uuid.hashCode();
+        return this.uuid != null ? this.uuid.hashCode() : 0;
     }
 
     @Override
@@ -429,6 +429,9 @@ public class Guild extends AbstractMutableEntity {
         }
 
         Guild guild = (Guild) obj;
+        if (this.uuid == null) {
+            return guild.uuid == null;
+        }
         return this.uuid.equals(guild.uuid);
     }
 
