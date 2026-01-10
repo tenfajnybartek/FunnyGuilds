@@ -240,13 +240,13 @@ Upewnij się, że wszystkie operacje I/O są asynchroniczne:
   - Player.kick(Component) zamiast String
   - Titles, Boss bars, Action bars z Components
 
-**TODO z kodu dla v5.0:**
-- [ ] PlaceholderAPIHook - usunąć deprecated 'prefix' placeholder
-- [ ] FlatGuildSerializer & DatabaseGuildSerializer - zmiana pola "attacked" → "protection"
-- [ ] GuildPlaceholdersService - zmiana placeholdera "total-points" → "points" (breaking change)
-- [ ] PluginConfiguration - usunąć przestarzałe pole `assistsRegionsIgnored`
-- [ ] TablistPageSerializer - usunąć stare formaty serializacji
-- [ ] GuildPermission - pobierać PLUGIN_NAMESPACE z instancji pluginu zamiast hardcode
+**TODO z kodu dla v5.0:** ✅ ZAKOŃCZONE (commit 6dfd59c)
+- [x] PlaceholderAPIHook - usunięto deprecated 'prefix' placeholder (tylko 'tag' działa)
+- [x] FlatGuildSerializer & DatabaseGuildSerializer - zmieniono pole "attacked" → "protection"
+- [x] GuildPlaceholdersService - zmieniono placeholder "total-points" → "points" (breaking change)
+- [x] PluginConfiguration - usunięto przestarzałe pole `assistsRegionsIgnored` (użyj flagi 'fg-no-assists')
+- [x] TablistPageSerializer - usunięto stare formaty serializacji ("player-list", "player-list-header", "player-list-footer")
+- [x] GuildPermission - PLUGIN_NAMESPACE teraz pobierany z instancji pluginu przez `getPluginNamespace()`
 
 ### Faza 4: Długoterminowa (przyszłe wersje)
 
