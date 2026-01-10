@@ -53,9 +53,16 @@ public class PlayerChat extends AbstractFunnyListener {
         String message = PlainTextComponentSerializer.plainText().serialize(event.message());
 
         User user = userOption.get();
+        
+        // Debug logging
+        FunnyGuilds.getPluginLogger().info("[DEBUG] Player: " + player.getName() + " Message: '" + message + "' HasGuild: " + user.getGuild().isPresent());
+        
         boolean isGuildChat = user.getGuild()
                 .map(guild -> this.sendGuildMessage(user, player, guild, message))
                 .orElseGet(false);
+
+        // Debug logging
+        FunnyGuilds.getPluginLogger().info("[DEBUG] isGuildChat: " + isGuildChat);
 
         if (isGuildChat) {
             event.setCancelled(true);
@@ -141,6 +148,9 @@ public class PlayerChat extends AbstractFunnyListener {
                                         Set<Guild> receivers, Type type) {
         int prefixLength = prefix.length();
 
+        // Debug logging
+        FunnyGuilds.getPluginLogger().info("[DEBUG] sendMessageToGuilds - Type: " + type + " Prefix: '" + prefix + "' Message: '" + message + "' MessageLength: " + message.length() + " PrefixLength: " + prefixLength);
+        
         if (message.length() > prefixLength && message.substring(0, prefixLength).equalsIgnoreCase(prefix)) {
             if (!this.handleUsePermission(user, playerGuild, type)) {
                 return true;
