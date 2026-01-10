@@ -72,6 +72,8 @@ public class BlockPlace extends AbstractFunnyListener {
         }
 
         // clone item before changing amount in the player's inventory
+        // Note: BlockPlaceEvent.getItemInHand() is the correct method to use here
+        // It returns the item that was used to place the block, accounting for which hand was used
         ItemStack itemInHand = event.getItemInHand();
         ItemStack returnItem = itemInHand.clone();
 
