@@ -27,6 +27,7 @@ import org.bukkit.event.EventPriority;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.panda_lang.utilities.inject.annotations.Inject;
 import panda.std.Option;
 import panda.std.stream.PandaStream;
@@ -48,8 +49,8 @@ public class PlayerChat extends AbstractFunnyListener {
             return;
         }
 
-        // Convert the Component message to legacy string for internal processing
-        String message = LegacyComponentSerializer.legacySection().serialize(event.message());
+        // Convert the Component message to plain text for prefix checking (e.g., "!", "!!")
+        String message = PlainTextComponentSerializer.plainText().serialize(event.message());
 
         User user = userOption.get();
         boolean isGuildChat = user.getGuild()
