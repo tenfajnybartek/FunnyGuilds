@@ -43,34 +43,19 @@ public class PlayerChat extends AbstractFunnyListener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
-        
-        // VERY VISIBLE DEBUG - This should ALWAYS show
-        Bukkit.getLogger().severe("===== FUNNYGUILDS CHAT EVENT FIRED =====");
-        Bukkit.getLogger().severe("Player: " + player.getName());
 
         Option<User> userOption = this.userManager.findByPlayer(player);
         if (userOption.isEmpty()) {
-            Bukkit.getLogger().severe("User not found in manager - returning");
             return;
         }
 
         // Convert the Component message to plain text for prefix checking (e.g., "!", "!!")
         String message = PlainTextComponentSerializer.plainText().serialize(event.message());
-        
-        Bukkit.getLogger().severe("Message extracted: '" + message + "'");
 
         User user = userOption.get();
-        boolean hasGuild = user.getGuild().isPresent();
-        Bukkit.getLogger().severe("User has guild: " + hasGuild);
-        
         boolean isGuildChat = user.getGuild()
-                .map(guild -> {
-                    Bukkit.getLogger().severe("Calling sendGuildMessage");
-                    return this.sendGuildMessage(user, player, guild, message);
-                })
+                .map(guild -> this.sendGuildMessage(user, player, guild, message))
                 .orElseGet(false);
-
-        Bukkit.getLogger().severe("isGuildChat result: " + isGuildChat);
 
         if (isGuildChat) {
             event.setCancelled(true);
@@ -156,10 +141,6 @@ public class PlayerChat extends AbstractFunnyListener {
                                         Set<Guild> receivers, Type type) {
         int prefixLength = prefix.length();
 
-        // VERY VISIBLE DEBUG
-        Bukkit.getLogger().severe("sendMessageToGuilds called - Type: " + type + " Prefix: '" + prefix + "' Message: '" + message + "' MessageLength: " + message.length() + " PrefixLength: " + prefixLength);
-        Bukkit.getLogger().severe("Checking if message starts with prefix: " + (message.length() > prefixLength && message.substring(0, prefixLength).equalsIgnoreCase(prefix)));
-        
         if (message.length() > prefixLength && message.substring(0, prefixLength).equalsIgnoreCase(prefix)) {
             if (!this.handleUsePermission(user, playerGuild, type)) {
                 return true;
