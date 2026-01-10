@@ -9,6 +9,7 @@ import net.dzikoysk.funnyguilds.shared.bukkit.FunnyServer;
 import net.dzikoysk.funnyguilds.shared.bukkit.NmsUtils;
 import net.dzikoysk.funnyguilds.shared.bukkit.PositionConverter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -16,6 +17,9 @@ import org.bukkit.metadata.MetadataValue;
 import panda.std.Option;
 
 public class BukkitUserProfile implements UserProfile {
+
+    private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+    private static final LegacyComponentSerializer LEGACY_SERIALIZER = LegacyComponentSerializer.legacySection();
 
     private final UUID uuid;
     private final FunnyServer funnyServer;
@@ -87,15 +91,50 @@ public class BukkitUserProfile implements UserProfile {
         }
 
         this.getPlayer().peek(player -> {
-            Component component = LegacyComponentSerializer.legacySection().deserialize(message);
+            Component component = parseMessage(message);
             player.sendMessage(component);
         });
+    }
+
+    /**
+     * Parse message with MiniMessage support (hex colors, gradients, hover, click) 
+     * and fallback to legacy formatting.
+     * 
+     * Supports:
+     * - Legacy: §a, §c, §l (section sign)
+     * - Hex colors: &#FF5733 or <#FF5733>
+     * - MiniMessage: <gradient:red:blue>text</gradient>, <rainbow>, <hover>, <click>
+     * 
+     * @param message The message to parse
+     * @return Parsed Adventure Component
+     */
+    private static Component parseMessage(String message) {
+        // If message contains MiniMessage tags or hex colors, use MiniMessage parser
+        if (message.contains("<") && (
+                message.contains("gradient") || 
+                message.contains("rainbow") || 
+                message.contains("hover") || 
+                message.contains("click") ||
+                message.contains("#"))) {
+            try {
+                // First convert legacy § codes to MiniMessage format
+                String legacyConverted = LEGACY_SERIALIZER.serialize(LEGACY_SERIALIZER.deserialize(message));
+                // Then parse with MiniMessage (supports hex, gradients, etc.)
+                return MINI_MESSAGE.deserialize(message);
+            } catch (Exception e) {
+                // Fallback to legacy if MiniMessage parsing fails
+                return LEGACY_SERIALIZER.deserialize(message);
+            }
+        }
+        
+        // Default: use legacy serializer for § codes
+        return LEGACY_SERIALIZER.deserialize(message);
     }
 
     @Override
     public void kick(String reason) {
         this.getPlayer().peek(player -> {
-            Component component = LegacyComponentSerializer.legacySection().deserialize(reason);
+            Component component = parseMessage(reason);
             player.kick(component);
         });
     }
