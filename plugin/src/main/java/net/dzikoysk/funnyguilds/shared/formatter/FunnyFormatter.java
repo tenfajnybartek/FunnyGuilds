@@ -13,10 +13,8 @@ public final class FunnyFormatter implements Replaceable {
 
     private final List<Replacement<?>> replacements = new ArrayList<>();
 
-    @Deprecated
-    public String format(String message) {
-        return this.replace(message);
-    }
+    // Removed deprecated format(String) instance method.
+    // Use replace(String) instead for the same functionality.
 
     public String replace(String text) {
         return this.replace(null, text);

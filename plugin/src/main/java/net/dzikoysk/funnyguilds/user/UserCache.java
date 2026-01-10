@@ -27,10 +27,9 @@ public class UserCache {
         this.user = user;
     }
 
-    @Deprecated
-    public DamageState getDamageHistory() {
-        return FunnyGuilds.getInstance().getDamageManager().getDamageState(this.user.getUUID());
-    }
+    // Removed deprecated getDamageHistory() method.
+    // To get damage history, use: FunnyGuilds.getInstance().getDamageManager().getDamageState(user.getUUID())
+    // or the new convenience method: user.getDamageState()
 
     public Option<IndividualPlayerList> getPlayerList() {
         return Option.of(this.playerList);

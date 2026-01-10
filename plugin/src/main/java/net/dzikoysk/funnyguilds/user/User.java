@@ -2,6 +2,7 @@ package net.dzikoysk.funnyguilds.user;
 
 import java.util.UUID;
 import net.dzikoysk.funnyguilds.FunnyGuilds;
+import net.dzikoysk.funnyguilds.damage.DamageState;
 import net.dzikoysk.funnyguilds.data.AbstractMutableEntity;
 import net.dzikoysk.funnyguilds.guild.Guild;
 import net.dzikoysk.funnyguilds.guild.permission.GuildPermissionChecker;
@@ -101,6 +102,16 @@ public class User extends AbstractMutableEntity {
     @Deprecated
     public boolean canManage() {
         return this.isOwner() || this.isDeputy();
+    }
+
+    /**
+     * Gets the damage state (damage history) for this user.
+     * This is a convenience method that replaces the deprecated UserCache.getDamageHistory().
+     *
+     * @return the damage state for this user
+     */
+    public DamageState getDamageState() {
+        return FunnyGuilds.getInstance().getDamageManager().getDamageState(this.uuid);
     }
 
     public boolean isOwner() {

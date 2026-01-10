@@ -23,30 +23,34 @@ Ten dokument zawiera kompleksową analizę wszystkich deprecated metod w projekc
    - **Status**: ✅ Nie jest deprecated - `BlockPlaceEvent.getItemInHand()` jest poprawną metodą
    - **Uwaga**: To jest specyficzna metoda eventu, która automatycznie obsługuje main hand/off hand
 
-### 📋 Wewnętrzne @Deprecated Metody (do przyszłego usunięcia)
+3. **UserCache.getDamageHistory() - USUNIĘTA**
+   - **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/user/UserCache.java:30`
+   - **Status**: ✅ USUNIĘTA (nie była używana nigdzie w kodzie)
+   - **Alternatywa**: Dodano nową metodę `User.getDamageState()` która daje tę samą funkcjonalność
+   - **Użycie nowej metody**: `user.getDamageState()` zamiast `user.getCache().getDamageHistory()`
+   - **Bezpośrednie użycie**: `FunnyGuilds.getInstance().getDamageManager().getDamageState(uuid)`
 
-Te metody są oznaczone jako deprecated w kodzie projektu i powinny zostać usunięte w przyszłych wersjach:
+4. **FunnyFormatter.format(String) - USUNIĘTA**
+   - **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/shared/formatter/FunnyFormatter.java:16`
+   - **Status**: ✅ USUNIĘTA (deprecated instancyjna metoda)
+   - **Alternatywa**: Użyj `replace(String)` zamiast `format(String)` - identyczna funkcjonalność
+   - **Uwaga**: Statyczna metoda `FunnyFormatter.format(text, placeholder, value)` NIE jest deprecated i działa poprawnie
 
-#### 1. UserCache.getDamageHistory()
-- **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/user/UserCache.java:30`
-- **Powód deprecation**: Metoda deleguje do `FunnyGuilds.getInstance().getDamageManager().getDamageState()`
-- **Rekomendacja**: Użyj bezpośrednio `DamageManager.getDamageState(UUID)` zamiast tej metody
-- **Użycie**: Brak znalezionych użyć w kodzie (może być usunięta)
+### 📋 Wewnętrzne @Deprecated Metody
 
-#### 2. User.canManage()
+Te metody są oznaczone jako deprecated w kodzie projektu:
+
+#### 1. User.canManage() - ZACHOWANE z ostrzeżeniem
 - **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/user/User.java:101`
+- **Status**: ⚠️ ZACHOWANE ale deprecated
 - **Powód deprecation**: Uproszczona logika - należy używać `GuildPermissionChecker` dla sprawdzania konkretnych uprawnień
 - **Rekomendacja**: Użyj `GuildPermissionChecker` dla bardziej granularnej kontroli uprawnień
+- **Użycie**: Brak znalezionych użyć w kodzie - można rozważyć usunięcie w przyszłości
 - **Dokumentacja**: `@deprecated use {@link GuildPermissionChecker} to check specific permissions`
 
-#### 3. FunnyFormatter.format(String)
-- **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/shared/formatter/FunnyFormatter.java:16`
-- **Powód deprecation**: Zastąpiona metodą `replace(String)`
-- **Rekomendacja**: Użyj `replace(String)` zamiast `format(String)`
-- **Implementacja**: Metoda obecnie tylko deleguje do `replace()`
-
-#### 4. RegionManager.deleteRegion(DataModel, Region)
+#### 2. RegionManager.deleteRegion(DataModel, Region) - ZACHOWANE
 - **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/guild/RegionManager.java:240`
+- **Status**: ⚠️ ZACHOWANE (zaplanowane do usunięcia)
 - **Powód deprecation**: Zaplanowane do usunięcia w wersji 5.0 wraz z refaktoryzacją bazy danych (GH-1402)
 - **Adnotacja**: `@ApiStatus.ScheduledForRemoval(inVersion = "5.0")`
 - **Rekomendacja**: Poczekaj na refaktoryzację bazy danych w wersji 5.0
@@ -66,7 +70,28 @@ Następujące metody zostały sprawdzone i NIE są deprecated w Minecraft 1.21.4
 
 ## Propozycje Refaktoryzacji i Ulepszeń
 
-### 1. Migracja do Adventure API (Opcjonalna, ale zalecana)
+### 1. ✅ ZROBIONE: Migracja do Adventure API dla Chat Events
+
+**Status**: ✅ ZAKOŃCZONE
+**Obecnie**: Projekt używa `AsyncChatEvent` z Adventure Components
+**Korzyści**:
+- Nowoczesne API wspierane przez Paper
+- Lepsza obsługa kolorów i formatowania (hex colors, hover/click events)
+- Przyszłościowa kompatybilność
+
+### 2. ✅ ZROBIONE: Usunięcie Deprecated Metod Wewnętrznych
+
+**Status**: ✅ ZAKOŃCZONE (częściowo)
+
+**Usunięte metody z zachowaniem funkcjonalności**:
+1. ✅ `UserCache.getDamageHistory()` - zastąpiona przez `User.getDamageState()`
+2. ✅ `FunnyFormatter.format(String)` - zastąpiona przez `replace(String)`
+
+**Zachowane metody** (do przyszłych wersji):
+- ⚠️ `User.canManage()` - brak użyć, może być usunięta w 5.0
+- ⚠️ `RegionManager.deleteRegion()` - zaplanowane usunięcie w 5.0 (GH-1402)
+
+### 3. Dalsza Migracja do Adventure API (Opcjonalna, zalecana dla przyszłości)
 
 **Obecnie**: Projekt używa String-based API dla wiadomości
 **Zalecenie**: Pełna migracja na Adventure Components
@@ -190,11 +215,14 @@ Upewnij się, że wszystkie operacje I/O są asynchroniczne:
 - [x] Migracja AsyncPlayerChatEvent → AsyncChatEvent
 - [x] Weryfikacja BlockPlaceEvent.getItemInHand()
 - [x] Stworzenie dokumentacji
+- [x] Usunięcie `UserCache.getDamageHistory()` z dodaniem `User.getDamageState()`
+- [x] Usunięcie deprecated `FunnyFormatter.format()` (instancyjna metoda)
+- [x] Głęboka analiza wszystkich 405 klas Java w projekcie
 
 ### Faza 2: Krótkoterminowa (do wersji 5.0)
-- [ ] Usunięcie `UserCache.getDamageHistory()`
-- [ ] Zamiana wszystkich użyć `User.canManage()` na `GuildPermissionChecker`
-- [ ] Zamiana wszystkich użyć `FunnyFormatter.format()` na `replace()`
+- [x] Usunięcie `UserCache.getDamageHistory()` i dodanie `User.getDamageState()`
+- [x] Usunięcie deprecated `FunnyFormatter.format(String)` instance method
+- [ ] Rozważenie usunięcia `User.canManage()` (brak użyć w kodzie)
 - [ ] Dodanie testów dla nowych implementacji
 
 ### Faza 3: Średnioterminowa (wersja 5.0+)
@@ -207,7 +235,95 @@ Upewnij się, że wszystkie operacje I/O są asynchroniczne:
 - [ ] MiniMessage support
 - [ ] Modernizacja architektury serwisów
 
-## Testowanie
+## Znalezione TODO i Potencjalne Ulepszenia
+
+### TODO z Kodu (Znalezione w analizie)
+
+1. **PlaceholderAPIHook.java**
+   - `TODO: [5.0] Remove 'prefix' placeholder` - deprecated placeholder do usunięcia
+
+2. **GuiWindow.java**
+   - `TODO: Use this method in the future. (Add ItemStack to configuration for fill inventory)` - dodać konfigurację dla wypełniania inventory
+
+3. **FlatGuildSerializer.java i DatabaseGuildSerializer.java**
+   - `TODO: [FG 5.0] attacked -> protection` - zmiana nazwy pola z "attacked" na "protection"
+   
+4. **GuildPlaceholdersService.java**
+   - `TODO: total-points -> points` - zmiana nazwy placeholdera (breaking change)
+
+5. **GuildPermission.java**
+   - `TODO: Retrieve from plugin instance` - PLUGIN_NAMESPACE hardcoded jako "funnyguilds"
+
+6. **FunnyTimeFormatter.java**
+   - `TODO: Option to change timezone (See GH-2085)` - dodać opcję zmiany strefy czasowej
+
+7. **PluginConfiguration.java**
+   - `TODO [5.0]: Remove` - `assistsRegionsIgnored` do usunięcia w 5.0
+
+8. **TablistPageSerializer.java**
+   - Kilka `TODO: remove in 5.0` - stare formaty do usunięcia
+
+### Dodatkowe Znaleziska
+
+#### Dobre Praktyki (już używane)
+- ✅ **ConcurrentHashMap** - używany prawidłowo dla thread-safe map
+- ✅ **AtomicInteger** - używany dla atomic operations
+- ✅ **Modern Item API** - Damageable, displayName(), lore() z Components
+- ✅ **RegistryAccess** - nowe Paper API dla enchantments i innych registries
+- ✅ **Adventure Components** - używane w ItemUtils, PlayerChat
+
+#### Potencjalne Ulepszenia
+
+1. **Synchronizacja**
+   - `UserCache.getScoreboard()` i `setScoreboard()` są `synchronized` - dobrze!
+   - Upewnij się że inne metody współdzielące stan też są thread-safe
+
+2. **Error Handling**
+   - `FunnyGuildsLogger.printStackTrace()` - używane do logowania errorów (OK)
+   - Większość kodu używa Option/Result dla error handling - świetnie!
+
+3. **Clone Usage**
+   - Używanie `.clone()` na ItemStack, Location, Vector - poprawne wykorzystanie
+   - BlockData.clone() - prawidłowe użycie
+
+4. **Thread Management**
+   - Brak manualnego `new Thread().start()` - używane są Bukkit schedulery ✅
+   - `task.start()` w RegenerationGui i FunnyGuilds - prawdopodobnie to są BukkitTask/Task obiekty
+
+## Bezpieczeństwo i Wydajność
+
+### ✅ Dobre Praktyki Znalezione w Kodzie
+
+1. **Thread Safety**
+   - ConcurrentHashMap dla współdzielonych map
+   - AtomicInteger dla liczników
+   - synchronized dla krytycznych sekcji (UserCache)
+
+2. **Nowoczesne API**
+   - Paper RegistryAccess zamiast deprecated Enchantment.getByName()
+   - Adventure Components dla text handling
+   - Damageable interface zamiast deprecated durability methods
+
+3. **Memory Management**
+   - WeakReference w BukkitUserProfile dla player/offline player
+   - Proper cleanup w UserCache
+
+4. **Null Safety**
+   - Option/Result zamiast null values
+   - @Nullable annotations
+   - Defensive checks
+
+### ⚠️ Rzeczy do Monitorowania
+
+1. **Database Refactoring (GH-1402)**
+   - Zaplanowana duża refaktoryzacja w 5.0
+   - Wpłynie na RegionManager.deleteRegion() i serializery
+
+2. **Backwards Compatibility**
+   - Kilka TODO dla breaking changes w 5.0
+   - Zmiana nazw placeholderów i pól bazy danych
+
+## Podsumowanie Znalezionych Problemów
 
 ### Testy Manualne Wymagane
 1. ✅ Test czatu publicznego z formatowaniem
