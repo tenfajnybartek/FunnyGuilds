@@ -13,11 +13,16 @@ public interface GuildPermission<T> {
     /**
      * Gets the plugin namespace for permission keys.
      * Retrieves from plugin instance name, converted to lowercase.
+     * Returns "funnyguilds" as fallback when plugin instance is not available (e.g., during tests).
      * 
      * @return the plugin namespace (e.g., "funnyguilds")
      */
     static String getPluginNamespace() {
-        return FunnyGuilds.getInstance().getName().toLowerCase();
+        FunnyGuilds instance = FunnyGuilds.getInstance();
+        if (instance == null || instance.getName() == null) {
+            return "funnyguilds"; // Fallback for tests
+        }
+        return instance.getName().toLowerCase();
     }
     
     /**
