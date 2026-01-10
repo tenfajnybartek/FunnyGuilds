@@ -24,7 +24,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.panda_lang.utilities.inject.annotations.Inject;
 import panda.std.Option;
 import panda.std.stream.PandaStream;
@@ -38,7 +40,7 @@ public class PlayerChat extends AbstractFunnyListener {
     private GuildPermissionChecker permissionChecker;
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onChat(AsyncPlayerChatEvent event) {
+    public void onChat(AsyncChatEvent event) {
         Player player = event.getPlayer();
 
         Option<User> userOption = this.userManager.findByPlayer(player);
@@ -46,16 +48,19 @@ public class PlayerChat extends AbstractFunnyListener {
             return;
         }
 
+        // Convert the Component message to legacy string for internal processing
+        String message = LegacyComponentSerializer.legacySection().serialize(event.message());
+
         User user = userOption.get();
         boolean isGuildChat = user.getGuild()
-                .map(guild -> this.sendGuildMessage(user, player, guild, event.getMessage()))
+                .map(guild -> this.sendGuildMessage(user, player, guild, message))
                 .orElseGet(false);
 
         if (isGuildChat) {
             event.setCancelled(true);
 
             if (this.config.logGuildChat) {
-                FunnyGuilds.getPluginLogger().info("[Guild Chat] " + player.getName() + ": " + event.getMessage());
+                FunnyGuilds.getPluginLogger().info("[Guild Chat] " + player.getName() + ": " + message);
             }
 
             return;
@@ -81,7 +86,24 @@ public class PlayerChat extends AbstractFunnyListener {
                     formatter.register("{POS}", "");
                 });
 
-        event.setFormat(formatter.replace(event.getFormat()));
+        // Apply formatting using the modern renderer API
+        // The renderer receives the display name and message as Components
+        event.renderer((source, sourceDisplayName, messageComponent, viewer) -> {
+            // Start with the default Minecraft format string pattern: "<player>: message"
+            // But apply our custom formatting to it
+            String defaultFormat = "<%1$s> %2$s";
+            String customFormat = formatter.replace(defaultFormat);
+            
+            // Serialize components to legacy strings for formatting
+            String displayNameStr = LegacyComponentSerializer.legacySection().serialize(sourceDisplayName);
+            String messageStr = LegacyComponentSerializer.legacySection().serialize(messageComponent);
+            
+            // Apply the custom format
+            String formattedMessage = String.format(customFormat, displayNameStr, messageStr);
+            
+            // Convert back to Component and return
+            return LegacyComponentSerializer.legacySection().deserialize(formattedMessage);
+        });
     }
 
     private boolean sendGuildMessage(User user, Player player, Guild guild, String message) {
