@@ -38,15 +38,15 @@ Ten dokument zawiera kompleksową analizę wszystkich deprecated metod w projekc
 
 ### 📋 Wewnętrzne @Deprecated Metody
 
-Te metody są oznaczone jako deprecated w kodzie projektu:
+Te metody były oznaczone jako deprecated w kodzie projektu:
 
-#### 1. User.canManage() - ZACHOWANE z ostrzeżeniem
+#### 1. User.canManage() - ✅ USUNIĘTA
 - **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/user/User.java:101`
-- **Status**: ⚠️ ZACHOWANE ale deprecated
+- **Status**: ✅ USUNIĘTA (commit 9ec7089)
 - **Powód deprecation**: Uproszczona logika - należy używać `GuildPermissionChecker` dla sprawdzania konkretnych uprawnień
 - **Rekomendacja**: Użyj `GuildPermissionChecker` dla bardziej granularnej kontroli uprawnień
-- **Użycie**: Brak znalezionych użyć w kodzie - można rozważyć usunięcie w przyszłości
-- **Dokumentacja**: `@deprecated use {@link GuildPermissionChecker} to check specific permissions`
+- **Użycie**: Brak znalezionych użyć w kodzie - została usunięta
+- **Dokumentacja**: Zalecane użycie `GuildPermissionChecker` do sprawdzania konkretnych uprawnień
 
 #### 2. RegionManager.deleteRegion(DataModel, Region) - ZACHOWANE
 - **Lokalizacja**: `plugin/src/main/java/net/dzikoysk/funnyguilds/guild/RegionManager.java:240`
@@ -86,9 +86,9 @@ Następujące metody zostały sprawdzone i NIE są deprecated w Minecraft 1.21.4
 **Usunięte metody z zachowaniem funkcjonalności**:
 1. ✅ `UserCache.getDamageHistory()` - zastąpiona przez `User.getDamageState()`
 2. ✅ `FunnyFormatter.format(String)` - zastąpiona przez `replace(String)`
+3. ✅ `User.canManage()` - zastąpiona przez `GuildPermissionChecker` (commit 9ec7089)
 
 **Zachowane metody** (do przyszłych wersji):
-- ⚠️ `User.canManage()` - brak użyć, może być usunięta w 5.0
 - ⚠️ `RegionManager.deleteRegion()` - zaplanowane usunięcie w 5.0 (GH-1402)
 
 ### 3. Dalsza Migracja do Adventure API (Opcjonalna, zalecana dla przyszłości)
@@ -219,11 +219,11 @@ Upewnij się, że wszystkie operacje I/O są asynchroniczne:
 - [x] Usunięcie deprecated `FunnyFormatter.format()` (instancyjna metoda)
 - [x] Głęboka analiza wszystkich 405 klas Java w projekcie
 
-### Faza 2: Krótkoterminowa (do wersji 5.0)
+### Faza 2: Krótkoterminowa (do wersji 5.0) ✅ ZAKOŃCZONE
 - [x] Usunięcie `UserCache.getDamageHistory()` i dodanie `User.getDamageState()`
 - [x] Usunięcie deprecated `FunnyFormatter.format(String)` instance method
-- [ ] Rozważenie usunięcia `User.canManage()` (brak użyć w kodzie)
-- [ ] Dodanie testów dla nowych implementacji
+- [x] Usunięcie `User.canManage()` (commit 9ec7089)
+- [x] Dodanie testów dla nowych implementacji (UserTest.kt)
 
 ### Faza 3: Średnioterminowa (wersja 5.0+)
 - [ ] Refaktoryzacja bazy danych (GH-1402)

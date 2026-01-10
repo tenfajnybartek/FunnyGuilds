@@ -62,13 +62,11 @@ String result = FunnyFormatter.format(text, "{PLAYER}", player.getName());
 
 ---
 
-## Deprecated Metody (Nadal Dostępne)
-
-Te metody są oznaczone jako `@Deprecated` ale nadal działają. Zalecamy migrację do nowych API.
+## Usunięte Metody (Wymaga Migracji)
 
 ### User.canManage() → GuildPermissionChecker
 
-**Deprecated**:
+**Stara metoda (usunięta w commit 9ec7089)**:
 ```java
 User user = ...;
 if (user.canManage()) {
@@ -76,7 +74,7 @@ if (user.canManage()) {
 }
 ```
 
-**Zalecane (bardziej granularne uprawnienia)**:
+**Nowa metoda (zalecana)**:
 ```java
 GuildPermissionChecker checker = ...;
 Guild guild = ...;
@@ -86,14 +84,39 @@ User user = ...;
 if (checker.hasPermission(guild, user, GenericGuildPermissions.INVITE_MEMBERS)) {
     // użytkownik może zapraszać członków
 }
+
+// Lub sprawdzenie wielu uprawnień
+if (user.isOwner() || user.isDeputy()) {
+    // równoważne do starego canManage()
+}
 ```
 
 **Dlaczego zmiana?**
-- `canManage()` była zbyt uproszczona (owner OR deputy)
+- `canManage()` była zbyt uproszczona (tylko owner OR deputy)
 - Nowy system pozwala na bardziej szczegółową kontrolę uprawnień
 - Możliwość customowych uprawnień dla różnych ról
+- Brak użyć w kodzie projektu
 
 ---
+
+## Deprecated Metody (Już Usunięte)
+
+Te metody były wcześniej deprecated ale zostały już usunięte. Jeśli je używasz, musisz zmigrować:
+
+### ~~User.canManage()~~ - USUNIĘTA
+
+Zobacz sekcję powyżej dla szczegółów migracji.
+
+---
+
+## Deprecated Metody (Nadal Dostępne)
+
+Te metody NIE zostały jeszcze usunięte ale są deprecated. Zalecamy migrację:
+
+### RegionManager.deleteRegion() - Scheduled for 5.0
+
+**Status**: Deprecated, scheduled for removal in version 5.0 (GH-1402)
+
 
 ## Zmiany w Event Handling (Paper)
 
@@ -202,13 +225,13 @@ private void handleChat(Player player, String message) {
 
 ### ✅ Wersja 5.0.0-SNAPSHOT (Aktualna)
 - ✅ Migracja AsyncChatEvent
-- ✅ Usunięcie UserCache.getDamageHistory()
+- ✅ Usunięcie UserCache.getDamageHistory() → User.getDamageState()
 - ✅ Usunięcie FunnyFormatter.format() (instance method)
-- ⚠️ Deprecated: User.canManage()
+- ✅ Usunięcie User.canManage() (commit 9ec7089)
+- ✅ Dodanie testów dla User.getDamageState()
 - ⚠️ Deprecated: RegionManager.deleteRegion()
 
 ### 🔮 Planowane w 5.0.0 (Final)
-- Usunięcie User.canManage()
 - Usunięcie RegionManager.deleteRegion()
 - Refaktoryzacja bazy danych (GH-1402)
 - Zmiana pola "attacked" → "protection"
@@ -226,5 +249,6 @@ Jeśli masz pytania lub problemy z migracją:
 ---
 
 **Ostatnia aktualizacja**: 2026-01-10  
-**Wersja dokumentu**: 1.0  
-**FunnyGuilds wersja**: 5.0.0-SNAPSHOT
+**Wersja dokumentu**: 1.1  
+**FunnyGuilds wersja**: 5.0.0-SNAPSHOT  
+**Ostatni commit**: 9ec7089 (User.canManage() removal + tests)
