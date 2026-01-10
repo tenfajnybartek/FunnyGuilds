@@ -226,14 +226,87 @@ Upewnij się, że wszystkie operacje I/O są asynchroniczne:
 - [x] Dodanie testów dla nowych implementacji (UserTest.kt)
 
 ### Faza 3: Średnioterminowa (wersja 5.0+)
+
+**Główne zadania:**
 - [ ] Refaktoryzacja bazy danych (GH-1402)
+  - Unifikacja DataModel architecture
+  - Usunięcie bezpośrednich odwołań do FlatDataModel/SQLDataModel
+  - Wprowadzenie abstrakcji dla operacji CRUD
 - [ ] Usunięcie `RegionManager.deleteRegion(DataModel, Region)`
+  - Zależne od refaktoryzacji bazy danych
+  - Scheduled for removal in version 5.0
 - [ ] Opcjonalna migracja na pełne Adventure API
+  - Player.sendMessage(Component) wszędzie zamiast String
+  - Player.kick(Component) zamiast String
+  - Titles, Boss bars, Action bars z Components
+
+**TODO z kodu dla v5.0:**
+- [ ] PlaceholderAPIHook - usunąć deprecated 'prefix' placeholder
+- [ ] FlatGuildSerializer & DatabaseGuildSerializer - zmiana pola "attacked" → "protection"
+- [ ] GuildPlaceholdersService - zmiana placeholdera "total-points" → "points" (breaking change)
+- [ ] PluginConfiguration - usunąć przestarzałe pole `assistsRegionsIgnored`
+- [ ] TablistPageSerializer - usunąć stare formaty serializacji
+- [ ] GuildPermission - pobierać PLUGIN_NAMESPACE z instancji pluginu zamiast hardcode
 
 ### Faza 4: Długoterminowa (przyszłe wersje)
-- [ ] Pełna integracja z Adventure Components
+
+**Adventure Components - Pełna integracja:**
+- [ ] Migracja wszystkich String messages na Components
+  - BukkitUserProfile.sendMessage() → Component API
+  - Guild.broadcast() → Component API
+  - Wszystkie klasy wysyłające wiadomości
 - [ ] MiniMessage support
-- [ ] Modernizacja architektury serwisów
+  - `<gradient:red:blue>Gradient text</gradient>`
+  - `<rainbow>Rainbow text</rainbow>`
+  - `<hover:show_text:'Tooltip'>Hover text</hover>`
+  - `<click:run_command:'/command'>Clickable</click>`
+- [ ] Hex color support w konfiguracjach
+  - FunnyFormatter z wsparciem hex: `{#FF5733}Kolorowy tekst`
+  - Konfiguracja z hex colors zamiast legacy codes
+
+**Modernizacja architektury:**
+- [ ] Refaktoryzacja serwisów
+  - Dependency Injection improvements
+  - Service lifecycle management
+  - Better separation of concerns
+- [ ] Asynchroniczne operacje I/O
+  - Wszystkie operacje bazy danych async
+  - File I/O async gdzie możliwe
+  - Better thread pool management
+- [ ] Performance optimizations
+  - Cache improvements
+  - Bulk operations optimization
+  - Memory usage optimization
+
+**Nowe funkcjonalności:**
+- [ ] Display Entities support (1.19.4+)
+  - Zamiana Armor Stands na Display Entities dla hologramów
+  - Lepsza wydajność i możliwości
+- [ ] Enhanced Persistent Data Container usage
+  - Metadata API → PDC wszędzie
+  - Custom data structures
+- [ ] FunnyTimeFormatter - opcja zmiany timezone (GH-2085)
+- [ ] GuiWindow - ItemStack w konfiguracji dla wypełniania inventory
+
+### Faza 5: Przyszłościowa (post 5.0)
+
+**Rozważenia długoterminowe:**
+- [ ] Kotlin migration
+  - Stopniowa migracja Java → Kotlin
+  - Null safety improvements
+  - Coroutines dla async operations
+- [ ] Modern Minecraft features
+  - Data-driven content gdzie możliwe
+  - Custom enchantments/items przez Registry API
+  - Lepsze wsparcie dla Paper exclusive features
+- [ ] Testing improvements
+  - Zwiększenie code coverage
+  - Integration tests
+  - Performance regression tests
+- [ ] Documentation
+  - API documentation (Javadoc/KDoc)
+  - User documentation
+  - Developer guides
 
 ## Znalezione TODO i Potencjalne Ulepszenia
 
