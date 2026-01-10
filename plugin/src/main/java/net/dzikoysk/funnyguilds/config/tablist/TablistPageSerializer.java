@@ -35,38 +35,19 @@ public class TablistPageSerializer implements ObjectSerializer<TablistPage> {
     public TablistPage deserialize(DeserializationData data, @NotNull GenericsDeclaration generics) {
         int cycles = data.get("cycles", Integer.class);
 
+        // Removed old format names in 5.0: "player-list", "player-list-header", "player-list-footer"
+        // Use: "cells", "header", "footer" instead
         Map<Integer, String> cells = data.containsKey("cells")
                 ? data.getAsMap("cells", Integer.class, String.class)
                 : null;
-
-        //TODO: remove in 5.0
-        if (cells == null) {
-            cells = data.containsKey("player-list")
-                    ? data.getAsMap("player-list", Integer.class, String.class)
-                    : null;
-        }
 
         String header = data.containsKey("header")
                 ? data.get("header", String.class)
                 : null;
 
-        //TODO: remove in 5.0
-        if (header == null) {
-            header = data.containsKey("player-list-header")
-                    ? data.get("player-list-header", String.class)
-                    : null;
-        }
-
         String footer = data.containsKey("footer")
                 ? data.get("footer", String.class)
                 : null;
-
-        //TODO: remove in 5.0
-        if (footer == null) {
-            footer = data.containsKey("player-list-footer")
-                    ? data.get("player-list-footer", String.class)
-                    : null;
-        }
 
         return new TablistPage(cycles, cells, header, footer);
     }

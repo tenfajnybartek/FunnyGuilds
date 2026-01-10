@@ -72,10 +72,9 @@ public abstract class WorldGuardHook extends AbstractPluginHook {
     }
 
     public boolean isInNonAssistsRegion(Location location) {
-        PluginConfiguration config = FunnyGuilds.getInstance().getPluginConfiguration();
+        // Removed assistsRegionsIgnored in 5.0 - use 'fg-no-assists' flag on regions instead
         return PandaStream.of(this.getRegions(location))
-                .find(region -> region.getFlag(this.noAssistsFlag) == StateFlag.State.ALLOW
-                        || config.assistsRegionsIgnored.contains(region.getId()))
+                .find(region -> region.getFlag(this.noAssistsFlag) == StateFlag.State.ALLOW)
                 .isPresent();
     }
 

@@ -124,10 +124,10 @@ public class GuildPlaceholdersService extends StaticPlaceholdersService<Guild, G
                                 ? String.valueOf(rank.getPosition(DefaultTops.GUILD_AVG_POINTS_TOP))
                                 : messages.get(entity, config -> config.minMembersToIncludeNoValue),
                         entity -> messages.get(entity, config -> config.minMembersToIncludeNoValue))
-                //TODO total-points -> points (I know this will break up backwards compatibility so I'm not doing it now)
-                .rankProperty("total-points", GuildRank::getPoints, 0)
+                // Changed in 5.0: "points" now returns total points (was average)
+                // Use "avg-points" for average points
+                .rankProperty("points", GuildRank::getPoints, 0)
                 .rankProperty("avg-points", GuildRank::getAveragePoints,0)
-                .rankProperty("points", GuildRank::getAveragePoints, 0)
                 .rankProperty("points-format",
                         (entity, guild, rank) -> FunnyFormatter.format(NumberRange.inRangeToString(rank.getAveragePoints(),
                                 pluginConfiguration.pointsFormat), "{POINTS}", guild.getRank().getAveragePoints()),

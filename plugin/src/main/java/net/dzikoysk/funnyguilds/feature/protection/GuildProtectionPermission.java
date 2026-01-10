@@ -23,7 +23,7 @@ public enum GuildProtectionPermission implements GuildPermission<Boolean> {
 
     GuildProtectionPermission(@KeyPattern String key, GuildMemberPermissionType memberPermissionType) {
         this.key = Key.key(
-                GuildPermission.PLUGIN_NAMESPACE,
+                GuildPermission.getPluginNamespace(),
                 key
         );
         this.memberPermissionType = memberPermissionType;

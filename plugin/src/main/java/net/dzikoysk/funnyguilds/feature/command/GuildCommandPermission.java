@@ -25,7 +25,7 @@ public enum GuildCommandPermission implements GuildPermission<Boolean> {
     private final Key key;
     
     GuildCommandPermission(@KeyPattern String key) {
-        this.key = Key.key(GuildPermission.PLUGIN_NAMESPACE, key);
+        this.key = Key.key(GuildPermission.getPluginNamespace(), key);
     }
     
     @Override

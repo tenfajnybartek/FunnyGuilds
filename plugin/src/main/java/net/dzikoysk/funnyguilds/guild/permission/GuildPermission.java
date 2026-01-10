@@ -1,5 +1,6 @@
 package net.dzikoysk.funnyguilds.guild.permission;
 
+import net.dzikoysk.funnyguilds.FunnyGuilds;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.key.KeyPattern;
 
@@ -9,7 +10,15 @@ import net.kyori.adventure.key.KeyPattern;
  */
 public interface GuildPermission<T> {
     
-    String PLUGIN_NAMESPACE = "funnyguilds"; // TODO: Retrieve from plugin instance
+    /**
+     * Gets the plugin namespace for permission keys.
+     * Retrieves from plugin instance name, converted to lowercase.
+     * 
+     * @return the plugin namespace (e.g., "funnyguilds")
+     */
+    static String getPluginNamespace() {
+        return FunnyGuilds.getInstance().getName().toLowerCase();
+    }
     
     /**
      * @return the unique key of the permission
@@ -25,7 +34,7 @@ public interface GuildPermission<T> {
      * @return a new guild permission with the given key and value type
      */
     static <T> GuildPermission<T> permission(@KeyPattern String key, Class<T> valueType) {
-        return new SimpleGuildPermission<>(Key.key(PLUGIN_NAMESPACE, key), valueType);
+        return new SimpleGuildPermission<>(Key.key(getPluginNamespace(), key), valueType);
     }
     
     static GuildPermission<Boolean> booleanPermission(@KeyPattern String key) {

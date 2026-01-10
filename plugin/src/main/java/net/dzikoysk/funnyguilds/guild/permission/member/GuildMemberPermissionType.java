@@ -56,7 +56,7 @@ public enum GuildMemberPermissionType implements GuildPermission<Boolean> {
     private final String displayName;
 
     GuildMemberPermissionType(@KeyPattern String key, String displayName) {
-        this.key = Key.key(GuildPermission.PLUGIN_NAMESPACE, key);
+        this.key = Key.key(GuildPermission.getPluginNamespace(), key);
         this.displayName = displayName;
     }
 
