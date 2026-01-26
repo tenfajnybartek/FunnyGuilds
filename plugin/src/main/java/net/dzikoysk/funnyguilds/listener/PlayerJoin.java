@@ -81,3 +81,4 @@ public class PlayerJoin extends AbstractFunnyListener {
     }
 
 }
+

@@ -1,9 +1,9 @@
 package net.dzikoysk.funnyguilds.feature.vault;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.dzikoysk.funnyguilds.config.PluginConfiguration;
 import net.dzikoysk.funnyguilds.guild.Guild;
 
@@ -13,7 +13,7 @@ import net.dzikoysk.funnyguilds.guild.Guild;
 public class GuildVaultManager {
 
     private final PluginConfiguration config;
-    private final Map<UUID, GuildVault> vaults = new HashMap<>();
+    private final Map<UUID, GuildVault> vaults = new ConcurrentHashMap<>();
 
     public GuildVaultManager(PluginConfiguration config) {
         this.config = config;

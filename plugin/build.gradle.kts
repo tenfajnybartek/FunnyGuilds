@@ -104,7 +104,6 @@ dependencies {
         exclude(group = "com.google.code.gson", module = "gson")
     }
     shadow("com.github.decentsoftware-eu:decentholograms:2.8.12")
-    shadow("us.dynmap:DynmapCoreAPI:3.6")
 
     /* tests */
     testImplementation("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
