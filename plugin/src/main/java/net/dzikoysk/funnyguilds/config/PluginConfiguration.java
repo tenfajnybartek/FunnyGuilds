@@ -1215,7 +1215,12 @@ public class PluginConfiguration extends OkaeriConfig {
     @Comment("Aby zostawić wszystkie hooki włączone wystarczy wpisać: disabled-hooks: []")
     public Set<String> disabledHooks = new HashSet<>();
 
-    // Dynmap support removed. Configuration for Dynmap hook was removed as Dynmap integration is no longer supported.
+    @Comment("")
+    @Comment("Typ zapisu danych:")
+    @Comment(" FLAT - lokalne pliki")
+    @Comment(" MYSQL - baza danych, kompatybilna z MySQL")
+    @Comment(" MARIADB - baza danych, kompatybilna z MariaDB")
+    public DataModel dataModel = DataModel.FLAT;
 
     @Comment("")
     @Comment("Dane wymagane do połączenia z bazą")

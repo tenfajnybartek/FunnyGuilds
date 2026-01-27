@@ -40,7 +40,8 @@ publishing {
 @Suppress("VulnerableLibrariesLocal")
 dependencies {
     /* funnyguilds */
-    project.project(":nms").subprojects.forEach {
+    // nms subprojects were removed — use safe lookup in case they are present in other checkouts
+    findProject(":nms")?.subprojects?.forEach {
         implementation(it)
     }
     implementation("net.dzikoysk:funnycommands:0.8.0")
@@ -154,7 +155,8 @@ tasks.withType<ShadowJar> {
         exclude(dependency("org.mariadb.jdbc:mariadb-java-client:.*"))
 
         // nms implementation modules are not referenced in the project but are required at runtime
-        parent!!.project(":nms").subprojects.forEach {
+        // iterate only if project exists (safe for checkouts without nms)
+        findProject(":nms")?.subprojects?.forEach {
             exclude(project(it.path))
         }
     }

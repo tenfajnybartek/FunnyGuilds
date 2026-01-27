@@ -132,18 +132,20 @@ subprojects {
     }
 }
 
+// Configure nms subprojects only when the nms project is present in the build
+findProject(":nms")?.let {
+    project(":nms").subprojects {
+        tasks.withType<Javadoc>().configureEach {
+            enabled = false
+        }
 
-project(":nms").subprojects {
-    tasks.withType<Javadoc>().configureEach { 
-        enabled = false
-    }
+        dependencies {
+            implementation("xyz.jpenilla:reflection-remapper:0.1.1")
+        }
 
-    dependencies {
-        implementation("xyz.jpenilla:reflection-remapper:0.1.1")
-    }
-
-    apply(plugin = "io.papermc.paperweight.userdev")
-    tasks.withType<RemapJar> {
-        toNamespace = OBF_NAMESPACE
+        apply(plugin = "io.papermc.paperweight.userdev")
+        tasks.withType<RemapJar> {
+            toNamespace = OBF_NAMESPACE
+        }
     }
 }

@@ -9,9 +9,10 @@ pluginManagement {
 
 include(
     ":plugin",
-    ":nms:api",
-    ":nms:v1_21",
-    ":nms:v1_21_4",
+    // nms modules removed from the workspace; if you re-add them, restore these includes
+    //":nms:api",
+    //":nms:v1_21",
+    //":nms:v1_21_4",
 )
 
 val isCiServer = System.getenv().containsKey("CI")
