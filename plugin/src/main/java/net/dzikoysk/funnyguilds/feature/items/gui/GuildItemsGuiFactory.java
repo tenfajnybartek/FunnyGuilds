@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.dzikoysk.funnyguilds.FunnyGuilds;
 import net.dzikoysk.funnyguilds.config.message.MessageService;
 import net.dzikoysk.funnyguilds.config.sections.items.GuildItemDefinition;
 import net.dzikoysk.funnyguilds.config.sections.items.GuildItemSet;
@@ -40,10 +39,9 @@ public final class GuildItemsGuiFactory {
             GuildItemSet set,
             String setName,
             ItemsConfiguration config,
-            MessageService messageService,
-            FunnyGuilds plugin
+            MessageService messageService
     ) {
-        return new GuildItemsGui(player, user, set, setName, config, messageService, plugin);
+        return new GuildItemsGui(player, user, set, setName, config, messageService);
     }
 
     static ChestGui buildChestGui(GuildItemsGui gui) {
@@ -59,7 +57,6 @@ public final class GuildItemsGuiFactory {
 
         ChestGui chestGui = new ChestGui(guiConfig.rows, legacyTitle);
         chestGui.setOnGlobalClick(event -> event.setCancelled(true));
-        chestGui.setOnClose(event -> gui.onInventoryClosed());
 
         populatePanes(gui, chestGui);
         return chestGui;
@@ -204,15 +201,8 @@ public final class GuildItemsGuiFactory {
         ItemMeta meta = base.getItemMeta();
         if (meta != null) {
             List<Component> lore = new ArrayList<>();
-
-            net.dzikoysk.funnyguilds.config.message.MessageConfiguration msgCfg =
-                    gui.getMessageService().getMessageRepositories().values().stream()
-                            .findFirst().orElse(null);
-            if (msgCfg == null) {
-                meta.lore(lore);
-                base.setItemMeta(meta);
-                return new GuiItem(base, event -> event.setCancelled(true));
-            }
+            MessageService messageService = gui.getMessageService();
+            Player player = gui.getPlayer();
 
             if (def.lore != null) {
                 for (String line : def.lore) {
@@ -220,23 +210,23 @@ public final class GuildItemsGuiFactory {
                         case "{MONEY_LINE}" -> {
                             if (set.requirements.moneyEnabled) {
                                 double current = VaultHook.isEconomyHooked()
-                                        ? VaultHook.accountBalance(gui.getPlayer()) : 0;
+                                        ? VaultHook.accountBalance(player) : 0;
                                 String statusColor = result.isMeetsMoney() ? "<green>" : "<red>";
-                                String template = msgCfg.itemsGuiMoneyLine
+                                String template = messageService.get(player, cfg -> cfg.itemsGuiMoneyLine)
                                         .replace("{STATUS_COLOR}", statusColor)
                                         .replace("{CURRENT}", formatMoney(current))
                                         .replace("{REQUIRED}", formatMoney(set.requiredMoney));
                                 lore.add(mm(template));
                             }
                         }
-                        case "{EXPERIENCE_LINE}" -> {
-                            if (set.requirements.experienceEnabled) {
-                                int current = gui.getPlayer().getLevel();
-                                String statusColor = result.isMeetsExperience() ? "<green>" : "<red>";
-                                String template = msgCfg.itemsGuiExperienceLine
+                        case "{LEVEL_LINE}" -> {
+                            if (set.requirements.levelEnabled) {
+                                int current = player.getLevel();
+                                String statusColor = result.isMeetsLevel() ? "<green>" : "<red>";
+                                String template = messageService.get(player, cfg -> cfg.itemsGuiLevelLine)
                                         .replace("{STATUS_COLOR}", statusColor)
                                         .replace("{CURRENT}", String.valueOf(current))
-                                        .replace("{REQUIRED}", String.valueOf(set.requiredExperience));
+                                        .replace("{REQUIRED}", String.valueOf(set.requiredLevel));
                                 lore.add(mm(template));
                             }
                         }
@@ -244,7 +234,7 @@ public final class GuildItemsGuiFactory {
                             if (set.requirements.rankEnabled && gui.getUser() != null) {
                                 int current = gui.getUser().getRank().getPoints();
                                 String statusColor = result.isMeetsRank() ? "<green>" : "<red>";
-                                String template = msgCfg.itemsGuiRankLine
+                                String template = messageService.get(player, cfg -> cfg.itemsGuiRankLine)
                                         .replace("{STATUS_COLOR}", statusColor)
                                         .replace("{CURRENT}", String.valueOf(current))
                                         .replace("{REQUIRED}", String.valueOf(set.requiredRank));
@@ -253,7 +243,10 @@ public final class GuildItemsGuiFactory {
                         }
                         case "{STATUS}" -> {
                             boolean ready = result.meetsAll();
-                            lore.add(mm(ready ? msgCfg.itemsGuiStatusReady : msgCfg.itemsGuiStatusNotReady));
+                            String template = ready
+                                    ? messageService.get(player, cfg -> cfg.itemsGuiStatusReady)
+                                    : messageService.get(player, cfg -> cfg.itemsGuiStatusNotReady);
+                            lore.add(mm(template));
                         }
                         default -> lore.add(mm(line));
                     }
