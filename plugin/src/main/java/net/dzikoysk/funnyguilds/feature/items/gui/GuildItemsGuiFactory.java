@@ -23,6 +23,7 @@ import net.dzikoysk.funnyguilds.feature.items.ItemRequirementResult.ItemCountRes
 import net.dzikoysk.funnyguilds.shared.adventure.MiniLegacyHelper;
 import net.dzikoysk.funnyguilds.user.User;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -52,8 +53,7 @@ public final class GuildItemsGuiFactory {
         if (rawTitle == null) rawTitle = gui.getSetName();
         String resolvedTitle = rawTitle.replace("{SET}", gui.getSetName());
         Component titleComponent = MiniLegacyHelper.miniMessage().deserialize(resolvedTitle);
-        String legacyTitle = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
-                .legacySection().serialize(titleComponent);
+        String legacyTitle = LegacyComponentSerializer.legacySection().serialize(titleComponent);
 
         ChestGui chestGui = new ChestGui(guiConfig.rows, legacyTitle);
         chestGui.setOnGlobalClick(event -> event.setCancelled(true));

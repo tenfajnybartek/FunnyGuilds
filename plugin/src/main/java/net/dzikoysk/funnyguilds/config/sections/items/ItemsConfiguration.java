@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import net.dzikoysk.funnyguilds.FunnyGuilds;
 
 /**
  * Główna klasa konfiguracji {@code items.yml}.
@@ -190,7 +191,7 @@ public class ItemsConfiguration extends OkaeriConfig {
             subConfig.updateDeclaration();
         }
         catch (Exception exception) {
-            net.dzikoysk.funnyguilds.FunnyGuilds.getPluginLogger().debug(
+            FunnyGuilds.getPluginLogger().debug(
                     "Failed to update declaration for sub-config " + subConfig.getClass().getSimpleName() + ": " + exception.getMessage()
             );
         }
